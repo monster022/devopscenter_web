@@ -100,12 +100,36 @@ export const constantRoutes = [
         component: () => import('@/views/kubernetes/fat/index'),
         meta: { title: 'Fat', icon: 'el-icon-ice-cream' }
       },
+      // {
+      //   path: 'office',
+      //   name: 'Office',
+      //   component: () => import('@/views/kubernetes/office/index'),
+      //   meta: { title: 'Office', icon: 'el-icon-dessert' }
+      // },
       {
-        path: 'office',
-        name: 'Office',
-        component: () => import('@/views/kubernetes/office/index'),
-        meta: { title: 'Office', icon: 'el-icon-dessert' }
-      }//,
+        path: 'deployment',
+        name: 'DeployMent',
+        component: () => import('@/views/kubernetes/deployment/index'),
+        meta: { title: '工作负载', icon: '' }
+      },
+      {
+        path: 'service',
+        name: 'Service',
+        component: () => import('@/views/kubernetes/deployment/index'),
+        meta: { title: '服务发现', icon: '' }
+      },
+      {
+        path: 'ingress',
+        name: 'Ingress',
+        component: () => import('@/views/kubernetes/deployment/index'),
+        meta: { title: '负载均衡', icon: '' }
+      },
+      {
+        path: 'cronjob',
+        name: 'CronJob',
+        component: () => import('@/views/kubernetes/deployment/index'),
+        meta: { title: '定时任务', icon: '' }
+      }
       // {
       //   path: 'prd',
       //   name: 'Prd',
