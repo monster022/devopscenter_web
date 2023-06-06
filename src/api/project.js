@@ -9,6 +9,24 @@ export function getList(params) {
   })
 }
 
+// 删除项目
+export function deleteList(id) {
+  return request({
+    url: '/project/' + id,
+    method: 'delete'
+  })
+}
+
+// 添加数据
+export function postAddition(data) {
+  return request({
+    url: '/project',
+    method: 'post',
+    headers: { 'Content-Type': 'multipart/form-data' },
+    data
+  })
+}
+
 // 分支数据
 export function getBranch(params) {
   return request({

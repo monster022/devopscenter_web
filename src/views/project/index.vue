@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <div>
-      <el-button type="primary" icon="el-icon-plus">添加项目</el-button>
+      <el-button type="primary" icon="el-icon-plus" @click="additionOpen()">添加项目</el-button>
     </div>
     <el-table
       v-loading="listLoading"
@@ -22,9 +22,9 @@
           <font color="#409EFF">{{ scope.row.project_name }}</font>
         </template>
       </el-table-column>
-      <el-table-column label="副本数" header-align="center" align="center">
+      <el-table-column label="语言" header-align="center" align="center">
         <template slot-scope="scope">
-          {{ scope.row.project_number }}
+          {{ scope.row.language }}
         </template>
       </el-table-column>
       <el-table-column label="构建" header-align="center" align="center">
@@ -43,18 +43,38 @@
         width="250"
         header-align="center"
       >
-        <template>
+        <template slot-scope="{row}">
           <el-button type="text" size="small" icon="el-icon-turn-off">禁用</el-button>
           <el-button type="text" size="small" icon="el-icon-open">启用</el-button>
           <el-button type="text" size="small" icon="el-icon-edit">编辑</el-button>
-          <el-button type="text" size="small" icon="el-icon-delete">删除</el-button>
+          <el-button type="text" size="small" icon="el-icon-delete" @click="deleteProject(row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
     <div class="line-space">
-      <el-pagination layout="total, prev, pager, next" :total="total" :page-size="size" @prev-click="pageChange" @next-click="pageChange" @current-change="pageChange" />
+      <el-pagination layout="total, prev, pager, next" :total="total" :current-page.sync="currentPage" :page-size="size" @prev-click="pageChange" @next-click="pageChange" @current-change="pageChange" />
     </div>
 
+    <!-- 添加 -->
+    <el-dialog title="添加项目" :visible.sync="additionDialogVisible" width="600px">
+      <el-form ref="additionForm" :model="additionForm" :rules="additionRules">
+        <el-form-item label="项目名" label-width="100px" prop="name">
+          <el-input v-model="additionForm.name" style="width: 400px;" />
+        </el-form-item>
+        <el-form-item label="语言" label-width="100px" prop="language">
+          <el-select v-model="additionForm.language" style="width: 400px;" placeholder="请选择项目语言">
+            <el-option label="Dotnet2.2" value="dotnet2.2" />
+            <el-option label="Dotnet5.0" value="dotnet5.0" />
+            <el-option label="Golang" value="go" />
+            <el-option label="Vue" value="vue" />
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button size="medium" @click="additionDialogVisible = false">取 消</el-button>
+        <el-button size="medium" type="primary" @click="additionSubmit('additionForm')">确 定</el-button>
+      </div>
+    </el-dialog>
     <!-- 构建 -->
     <el-dialog title="构建" :visible.sync="buildDialogVisible" width="600px" center>
       <el-form ref="buildForm" :model="buildForm" :rules="buildRules">
@@ -70,7 +90,6 @@
                 <el-option label="dev" value="dev" />
                 <el-option label="uat" value="uat" />
                 <el-option label="fat" value="fat" />
-                <el-option label="pro" value="pro" />
               </el-select>
             </el-form-item>
           </el-col>
@@ -147,11 +166,10 @@
           </el-col>
           <el-col :span="12">
             <el-form-item label="环境" label-width="80px">
-              <el-select v-model="deployForm.env" style="width: 150px;" @change="tagSelect()">
+              <el-select v-model="deployForm.env" style="width: 150px;" placeholder="请选择发布环境" @change="tagSelect()">
                 <el-option label="dev" value="dev" />
                 <el-option label="uat" value="uat" />
                 <el-option label="fat" value="fat" />
-                <el-option label="pro" value="pro" />
               </el-select>
             </el-form-item>
           </el-col>
@@ -195,7 +213,7 @@
 
 <script>
 import { getNameSpaceList } from '@/api/namespace'
-import { getList, getBranch, getHarborTag, postJenkinsJobBuild } from '@/api/project'
+import { getList, getBranch, getHarborTag, postJenkinsJobBuild, deleteList, postAddition } from '@/api/project'
 import { getSpecifyDeployMent, patchDeploymentImage } from '@/api/deployment'
 // import axios from 'axios'
 
@@ -207,17 +225,25 @@ export default {
       // 分页设置
       total: null,
       size: 13,
+      currentPage: 1,
       // 项目分支数组
       branchList: [],
       // 容器名数组
       containirNameList: [],
       // 名称空间数组
       namespaceList: [],
+      // 添加项目状态与数据
+      additionDialogVisible: false,
+      additionForm: {
+        name: '',
+        language: ''
+      },
       // 构建状态与数据
       buildDialogVisible: false,
       buildForm: {
         name: '',
         env: '',
+        language: '',
         repository: '',
         dependent_repository: 'git@gitlab.mojorycorp.cn:mojory/commonlibs.git',
         dependent_project: 'commonlibs',
@@ -259,6 +285,11 @@ export default {
         package_name: [
           { required: true, message: '必须填写包名', trigger: 'submit' }
         ]
+      },
+      // addition规则
+      additionRules: {
+        name: [{ required: true, message: '必须输入项目名', trigger: 'blur' }],
+        language: [{ required: true, message: '必须选择语言', trigger: 'blur' }]
       }
     }
   },
@@ -288,6 +319,45 @@ export default {
         this.total = response.total
       })
     },
+    deleteProject(val) {
+      console.log(val)
+      this.$confirm('此操作将永久删除该记录，是否继续？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        deleteList(val.id).then(response => {
+          this.$message({
+            type: 'success',
+            message: response.message
+          })
+        })
+        this.fetchData()
+        this.currentPage = 1
+      })
+    },
+    additionOpen() {
+      this.additionForm.name = ''
+      this.additionForm.language = ''
+      this.additionDialogVisible = true
+    },
+    additionSubmit(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          const data = {
+            name: this.additionForm.name,
+            language: this.additionForm.language
+          }
+          postAddition(data).then(response => {
+            this.$message.success(response.message)
+          })
+          this.additionDialogVisible = false
+          this.fetchData()
+        } else {
+          return false
+        }
+      })
+    },
     buildOpen(row) {
       const params = {
         id: row.project_id
@@ -297,6 +367,7 @@ export default {
       })
       this.buildForm.name = row.project_name
       this.buildForm.repository = row.project_repo
+      this.buildForm.language = row.language
       this.buildForm.env = ''
       this.buildForm.branch = ''
       this.buildForm.sub_name = ''
@@ -311,6 +382,7 @@ export default {
           const data = {
             env: this.buildForm.env,
             repository: this.buildForm.repository,
+            language: this.buildForm.language,
             dependent_repository: this.buildForm.dependent_repository,
             project: this.buildForm.name,
             dependent_project: this.buildForm.dependent_project,
