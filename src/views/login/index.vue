@@ -3,7 +3,7 @@
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
 
       <div class="title-container">
-        <h3 class="title">Login Form</h3>
+        <h3 class="title">Login</h3>
       </div>
 
       <el-form-item prop="username">
@@ -43,10 +43,10 @@
 
       <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">Login</el-button>
 
-      <div class="tips">
+      <!-- <div class="tips">
         <span style="margin-right:20px;">username: admin</span>
         <span> password: any</span>
-      </div>
+      </div> -->
 
     </el-form>
   </div>
@@ -54,6 +54,7 @@
 
 <script>
 import { validUsername } from '@/utils/validate'
+import { login } from '@/api/user'
 
 export default {
   name: 'Login',
@@ -75,10 +76,10 @@ export default {
     return {
       loginForm: {
         username: 'admin',
-        password: '111111'
+        password: '1234567899'
       },
       loginRules: {
-        username: [{ required: true, trigger: 'blur', validator: validateUsername }],
+        // username: [{ required: true, trigger: 'blur', validator: validateUsername }],
         password: [{ required: true, trigger: 'blur', validator: validatePassword }]
       },
       loading: false,
@@ -106,11 +107,33 @@ export default {
       })
     },
     handleLogin() {
+      // this.$refs.loginForm.validate(vaild => {
+      //   if (vaild) {
+      //     this.loading = true
+      //     const data = {
+      //       username: this.loginForm.username,
+      //       password: this.loginForm.password
+      //     }
+      //     login(data).then(response => {
+      //       const token = response.data.token
+      //       console.log(response.data.token)
+      //       localStorage.setItem('token', token)
+      //       this.$store.commit('user/SET_TOKEN', token)
+      //       this.$router.push({ path: '/project' })
+      //       this.loading = false
+      //     }).catch(() => {
+      //       this.loading = false
+      //     })
+      //   } else {
+      //     console.log('error submit!!')
+      //     return false
+      //   }
+      // })
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
           this.$store.dispatch('user/login', this.loginForm).then(() => {
-            this.$router.push({ path: this.redirect || '/' })
+            this.$router.push({ path: '/' })
             this.loading = false
           }).catch(() => {
             this.loading = false
