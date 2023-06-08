@@ -43,29 +43,19 @@
 
       <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">Login</el-button>
 
-      <!-- <div class="tips">
-        <span style="margin-right:20px;">username: admin</span>
-        <span> password: any</span>
-      </div> -->
+      <div class="tips">
+        <span style="margin-right:20px;">OpenLDAP Login</span>
+      </div>
 
     </el-form>
   </div>
 </template>
 
 <script>
-import { validUsername } from '@/utils/validate'
-import { login } from '@/api/user'
 
 export default {
   name: 'Login',
   data() {
-    const validateUsername = (rule, value, callback) => {
-      if (!validUsername(value)) {
-        callback(new Error('Please enter the correct user name'))
-      } else {
-        callback()
-      }
-    }
     const validatePassword = (rule, value, callback) => {
       if (value.length < 6) {
         callback(new Error('The password can not be less than 6 digits'))
@@ -75,11 +65,11 @@ export default {
     }
     return {
       loginForm: {
-        username: 'yening',
-        password: '1qaz@WSX'
+        username: '',
+        password: ''
       },
       loginRules: {
-        // username: [{ required: true, trigger: 'blur', validator: validateUsername }],
+        username: [{ required: true, trigger: 'blur' }],
         password: [{ required: true, trigger: 'blur', validator: validatePassword }]
       },
       loading: false,
@@ -107,28 +97,6 @@ export default {
       })
     },
     handleLogin() {
-      // this.$refs.loginForm.validate(vaild => {
-      //   if (vaild) {
-      //     this.loading = true
-      //     const data = {
-      //       username: this.loginForm.username,
-      //       password: this.loginForm.password
-      //     }
-      //     login(data).then(response => {
-      //       const token = response.data.token
-      //       console.log(response.data.token)
-      //       localStorage.setItem('token', token)
-      //       this.$store.commit('user/SET_TOKEN', token)
-      //       this.$router.push({ path: '/project' })
-      //       this.loading = false
-      //     }).catch(() => {
-      //       this.loading = false
-      //     })
-      //   } else {
-      //     console.log('error submit!!')
-      //     return false
-      //   }
-      // })
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
