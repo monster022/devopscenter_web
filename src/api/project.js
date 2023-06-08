@@ -69,3 +69,10 @@ export function getHarborTag(params) {
   })
 }
 
+export function patchStatus(params) {
+  return request({
+    url: '/project',
+    method: 'patch',
+    params
+  })
+}

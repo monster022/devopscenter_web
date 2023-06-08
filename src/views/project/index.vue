@@ -6,7 +6,9 @@
     <el-table
       v-loading="listLoading"
       :data="list"
-      element-loading-text="Loading"
+      element-loading-text="拼命加载中"
+      element-loading-spinner="el-icon-loading"
+      element-loading-background="rgba(0, 0, 0, 0.8)"
       fit
       stripe
       max-height="815"
@@ -29,12 +31,12 @@
       </el-table-column>
       <el-table-column label="构建" header-align="center" align="center">
         <template slot-scope="{row}">
-          <el-button type="text" size="mini" @click="buildOpen(row)">build</el-button>
+          <el-button :disabled="row.project_status === 0" type="text" size="mini" @click="buildOpen(row)">build</el-button>
         </template>
       </el-table-column>
       <el-table-column label="发布" header-align="center" align="center">
         <template slot-scope="{row}">
-          <el-button type="text" size="mini" @click="deployOpen(row)">deploy</el-button>
+          <el-button :disabled="row.project_status === 0" type="text" size="mini" @click="deployOpen(row)">deploy</el-button>
         </template>
       </el-table-column>
       <el-table-column
@@ -44,10 +46,10 @@
         header-align="center"
       >
         <template slot-scope="{row}">
-          <el-button type="text" size="small" icon="el-icon-turn-off">禁用</el-button>
-          <el-button type="text" size="small" icon="el-icon-open">启用</el-button>
-          <el-button type="text" size="small" icon="el-icon-edit">编辑</el-button>
-          <el-button type="text" size="small" icon="el-icon-delete" @click="deleteProject(row)">删除</el-button>
+          <el-button :disabled="row.project_status === 1" type="text" size="small" icon="el-icon-open" @click="switchStatusEnable(row)">启用</el-button>
+          <el-button :disabled="row.project_status === 0" type="text" size="small" icon="el-icon-turn-off" @click="switchStatusDisable(row)">禁用</el-button>
+          <el-button :disabled="row.project_status === 0" type="text" size="small" icon="el-icon-edit">编辑</el-button>
+          <el-button :disabled="row.project_status === 0" type="text" size="small" icon="el-icon-delete" @click="deleteProject(row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -97,7 +99,7 @@
         <el-form-item label="仓库地址" label-width="80px">
           <el-input v-model="buildForm.repository" style="width: 425px;" :disabled="true" />
         </el-form-item>
-        <el-form-item label="是否依赖" label-width="90px">
+        <el-form-item v-if="buildForm.language === 'dotnet5.0' || buildForm.language === 'dotnet2.2'" label="是否依赖" label-width="90px">
           <el-switch v-model="buildForm.depend" />
         </el-form-item>
         <el-row>
@@ -127,7 +129,7 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="是否包含子项目" label-width="150px">
+            <el-form-item v-if="buildForm.language === 'dotnet5.0' || buildForm.language === 'dotnet2.2'" label="是否包含子项目" label-width="150px">
               <!--el-input v-model="buildForm.sub_name" style="width: 150px;" placeholder="一个项目包含多个子项目时填写" /-->
               <el-switch v-model="buildForm.include_subname" />
             </el-form-item>
@@ -136,10 +138,10 @@
         <el-form-item v-if="buildForm.include_subname === true" label="子名称" label-width="80px">
           <el-input v-model="buildForm.sub_name" style="width: 425px;" placeholder="一个项目包含多个子项目时填写" />
         </el-form-item>
-        <el-form-item label="构建路径" label-width="80px" prop="build_path">
+        <el-form-item v-if="buildForm.language === 'dotnet5.0' || buildForm.language === 'dotnet2.2'" label="构建路径" label-width="80px" prop="build_path">
           <el-input v-model="buildForm.build_path" style="width: 425px;" placeholder=".cspro文件所在路径" />
         </el-form-item>
-        <el-form-item label="包名" label-width="80px" prop="package_name">
+        <el-form-item v-if="buildForm.language === 'dotnet5.0' || buildForm.language === 'dotnet2.2'" label="包名" label-width="80px" prop="package_name">
           <el-input v-model="buildForm.package_name" style="width: 425px;" placeholder="编译生成出的可执行文件名" />
         </el-form-item>
         <el-form-item label="镜像源" label-width="80px" prop="image_source">
@@ -214,7 +216,7 @@
 
 <script>
 import { getNameSpaceList } from '@/api/namespace'
-import { getList, getBranch, getHarborTag, postJenkinsJobBuild, deleteList, postAddition } from '@/api/project'
+import { getList, getBranch, getHarborTag, postJenkinsJobBuild, deleteList, postAddition, patchStatus } from '@/api/project'
 import { getSpecifyDeployMent, patchDeploymentImage } from '@/api/deployment'
 // import axios from 'axios'
 
@@ -222,7 +224,7 @@ export default {
   data() {
     return {
       list: null,
-      listLoading: true,
+      listLoading: false,
       // 分页设置
       total: null,
       size: 13,
@@ -304,10 +306,12 @@ export default {
         page: 1,
         size: this.size
       }
-      getList(params).then(response => {
-        this.list = response.data
-        this.total = response.total
-      })
+      setTimeout(() => {
+        getList(params).then(response => {
+          this.list = response.data
+          this.total = response.total
+        })
+      }, 300)
       this.listLoading = false
     },
     pageChange(val) {
@@ -319,6 +323,34 @@ export default {
         this.list = response.data
         this.total = response.total
       })
+    },
+    switchStatusEnable(val) {
+      console.log(val.project_status)
+      const params = {
+        status: 1,
+        id: val.id
+      }
+      patchStatus(params).then(response => {
+        this.$message({
+          type: 'success',
+          message: response.message
+        })
+      })
+      this.fetchData()
+    },
+    switchStatusDisable(val) {
+      console.log(val.project_status)
+      const params = {
+        status: 0,
+        id: val.id
+      }
+      patchStatus(params).then(response => {
+        this.$message({
+          type: 'success',
+          message: response.message
+        })
+      })
+      this.fetchData()
     },
     deleteProject(val) {
       console.log(val)
