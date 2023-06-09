@@ -94,7 +94,7 @@
       </div>
     </el-dialog>
 
-    <el-pagination layout="total, prev, pager, next" :total="total" hide-on-single-page="true" :current-page.sync="currentPage" :page-size="size" @prev-click="pageChange" @next-click="pageChange" @current-change="pageChange" />
+    <el-pagination layout="total, prev, pager, next" :total="total" hide-on-single-page :current-page.sync="currentPage" :page-size="size" @prev-click="pageChange" @next-click="pageChange" @current-change="pageChange" />
   </div>
 </template>
 
