@@ -386,15 +386,23 @@ export default {
     additionSubmit(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
+          if (this.additionForm.language === 'vue' || this.additionForm.language === 'go') {
+            this.additionForm.build_path = 'none'
+            this.additionForm.package_name = 'none'
+          }
           const data = {
             name: this.additionForm.name,
-            language: this.additionForm.language
+            language: this.additionForm.language,
+            build_path: this.additionForm.build_path,
+            package_name: this.additionForm.package_name
           }
           postAddition(data).then(response => {
             this.$message.success(response.message)
           })
           this.additionDialogVisible = false
-          this.fetchData()
+          setTimeout(() => {
+            this.fetchData()
+          }, 500)
         } else {
           return false
         }
@@ -410,12 +418,12 @@ export default {
       this.buildForm.name = row.project_name
       this.buildForm.repository = row.project_repo
       this.buildForm.language = row.language
+      this.buildForm.build_path = row.build_path
+      this.buildForm.package_name = row.package_name
       this.buildForm.env = ''
       this.buildForm.branch = ''
       this.buildForm.sub_name = ''
       this.buildForm.image_source = ''
-      this.buildForm.build_path = ''
-      this.buildForm.package_name = ''
       this.buildDialogVisible = true
     },
     buildSubmit(formName) {
