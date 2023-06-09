@@ -48,7 +48,7 @@
         <template slot-scope="{row}">
           <el-button :disabled="row.project_status === 1" type="text" size="small" icon="el-icon-open" @click="switchStatusEnable(row)">启用</el-button>
           <el-button :disabled="row.project_status === 0" type="text" size="small" icon="el-icon-turn-off" @click="switchStatusDisable(row)">禁用</el-button>
-          <el-button :disabled="row.project_status === 0" type="text" size="small" icon="el-icon-edit">编辑</el-button>
+          <el-button :disabled="row.project_status === 0" type="text" size="small" icon="el-icon-edit" @click="editProjectOpen(row)">编辑</el-button>
           <el-button :disabled="row.project_status === 0" type="text" size="small" icon="el-icon-delete" @click="deleteProject(row)">删除</el-button>
         </template>
       </el-table-column>
@@ -81,6 +81,39 @@
       <div slot="footer" class="dialog-footer">
         <el-button size="medium" @click="additionDialogVisible = false">取 消</el-button>
         <el-button size="medium" type="primary" @click="additionSubmit('additionForm')">确 定</el-button>
+      </div>
+    </el-dialog>
+    <!-- 编辑 -->
+    <el-dialog title="编辑项目" :visible.sync="editDialogVisible" width="600px">
+      <el-form :model="editForm">
+        <el-form-item label="项目名" label-width="100px">
+          <el-input v-model="editForm.name" :disabled="true" style="width: 400px;" />
+        </el-form-item>
+        <el-form-item label="项目仓库" label-width="100px">
+          <el-input v-model="editForm.repo" :disabled="true" style="width: 400px;" />
+        </el-form-item>
+        <el-row>
+          <el-col :span="8">
+            <el-form-item label="ID" label-width="100px">
+              <el-input v-model="editForm.project_id" :disabled="true" style="width: 150px;" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="语言" label-width="150px">
+              <el-input v-model="editForm.language" :disabled="true" style="width: 160px;" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-form-item label="构建路径" label-width="100px">
+          <el-input v-model="editForm.build_path" style="width: 400px;" />
+        </el-form-item>
+        <el-form-item label="项目包名" label-width="100px">
+          <el-input v-model="editForm.package_name" style="width: 400px;" />
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button size="medium" @click="editDialogVisible = false">取 消</el-button>
+        <el-button size="medium" type="primary" @click="editSubmit()">确 定</el-button>
       </div>
     </el-dialog>
     <!-- 构建 -->
@@ -222,7 +255,7 @@
 
 <script>
 import { getNameSpaceList } from '@/api/namespace'
-import { getList, getBranch, getHarborTag, postJenkinsJobBuild, deleteList, postAddition, patchStatus } from '@/api/project'
+import { getList, getBranch, getHarborTag, postJenkinsJobBuild, deleteList, postAddition, patchStatus, patchEdit } from '@/api/project'
 import { getSpecifyDeployMent, patchDeploymentImage } from '@/api/deployment'
 // import axios from 'axios'
 
@@ -245,6 +278,16 @@ export default {
       additionDialogVisible: false,
       additionForm: {
         name: '',
+        language: '',
+        build_path: '',
+        package_name: ''
+      },
+      // 编辑项目数据
+      editDialogVisible: false,
+      editForm: {
+        name: '',
+        project_id: null,
+        repo: '',
         language: '',
         build_path: '',
         package_name: ''
@@ -407,6 +450,29 @@ export default {
           return false
         }
       })
+    },
+    editProjectOpen(val) {
+      this.editForm.name = val.project_name
+      this.editForm.project_id = val.project_id
+      this.editForm.repo = val.project_repo
+      this.editForm.language = val.language
+      this.editForm.build_path = val.build_path
+      this.editForm.package_name = val.package_name
+      this.editDialogVisible = true
+    },
+    editSubmit() {
+      const data = {
+        build_path: this.editForm.build_path,
+        package_name: this.editForm.package_name
+      }
+      patchEdit(this.editForm.name, data).then(response => {
+        this.$message({
+          type: 'success',
+          message: response.message
+        })
+      })
+      this.editDialogVisible = false
+      this.fetchData()
     },
     buildOpen(row) {
       const params = {

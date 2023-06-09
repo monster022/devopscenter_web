@@ -69,10 +69,21 @@ export function getHarborTag(params) {
   })
 }
 
+// 修改状态
 export function patchStatus(params) {
   return request({
     url: '/project',
     method: 'patch',
     params
+  })
+}
+
+// 修改项目构建路径与包名
+export function patchEdit(name, data) {
+  return request({
+    url: '/project/' + name,
+    method: 'patch',
+    headers: { 'Content-Type': 'multipart/form-data' },
+    data
   })
 }
