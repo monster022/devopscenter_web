@@ -4,11 +4,11 @@
       <el-button type="primary" icon="el-icon-plus" @click="additionOpen()">添加项目</el-button>
     </div>
     <el-table
-      v-loading="listLoading"
+      v-loading.fullscreen.lock="fullscreenLoading"
       :data="list"
-      element-loading-text="拼命加载中"
+      element-loading-text="小老弟莫急 正玩命加载中"
       element-loading-spinner="el-icon-loading"
-      element-loading-background="rgba(0, 0, 0, 0.8)"
+      element-loading-background="rgba(0, 0, 0, 0.7)"
       fit
       stripe
       max-height="815"
@@ -54,7 +54,7 @@
       </el-table-column>
     </el-table>
     <div class="line-space">
-      <el-pagination layout="total, prev, pager, next" :total="total" :current-page.sync="currentPage" :page-size="size" @prev-click="pageChange" @next-click="pageChange" @current-change="pageChange" />
+      <el-pagination layout="total, prev, pager, next" :total="total" hide-on-single-page="true" :current-page.sync="currentPage" :page-size="size" @prev-click="pageChange" @next-click="pageChange" @current-change="pageChange" />
     </div>
 
     <!-- 添加 -->
@@ -70,6 +70,12 @@
             <el-option label="Golang" value="go" />
             <el-option label="Vue" value="vue" />
           </el-select>
+        </el-form-item>
+        <el-form-item v-if="additionForm.language == 'dotnet5.0' || additionForm.language == 'dotnet2.2'" label="构建路径" label-width="100px">
+          <el-input v-model="additionForm.build_path" style="width: 400px;" />
+        </el-form-item>
+        <el-form-item v-if="additionForm.language == 'dotnet5.0' || additionForm.language == 'dotnet2.2'" label="包名" label-width="100px">
+          <el-input v-model="additionForm.package_name" style="width: 400px;" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -224,7 +230,7 @@ export default {
   data() {
     return {
       list: null,
-      listLoading: false,
+      fullscreenLoading: false,
       // 分页设置
       total: null,
       size: 13,
@@ -239,7 +245,9 @@ export default {
       additionDialogVisible: false,
       additionForm: {
         name: '',
-        language: ''
+        language: '',
+        build_path: '',
+        package_name: ''
       },
       // 构建状态与数据
       buildDialogVisible: false,
@@ -301,18 +309,19 @@ export default {
   },
   methods: {
     fetchData() {
-      this.listLoading = true
+      this.fullscreenLoading = true
       const params = {
         page: 1,
         size: this.size
       }
+
+      getList(params).then(response => {
+        this.list = response.data
+        this.total = response.total
+      })
       setTimeout(() => {
-        getList(params).then(response => {
-          this.list = response.data
-          this.total = response.total
-        })
-      }, 300)
-      this.listLoading = false
+        this.fullscreenLoading = false
+      }, 500)
     },
     pageChange(val) {
       const params = {

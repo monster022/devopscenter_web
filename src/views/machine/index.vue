@@ -7,9 +7,11 @@
 
     <!-- 表格 -->
     <el-table
-      v-loading="listLoading"
+      v-loading.fullscreen.lock="fullscreenLoading"
       :data="list"
-      element-loading-text="Loading"
+      element-loading-text="小老弟莫急 正玩命加载中"
+      element-loading-spinner="el-icon-loading"
+      element-loading-background="rgba(0, 0, 0, 0.7)"
       fit
       stripe
       max-height="815"
@@ -92,7 +94,7 @@
       </div>
     </el-dialog>
 
-    <el-pagination layout="total, prev, pager, next" :total="total" :current-page.sync="currentPage" :page-size="size" @prev-click="pageChange" @next-click="pageChange" @current-change="pageChange" />
+    <el-pagination layout="total, prev, pager, next" :total="total" hide-on-single-page="true" :current-page.sync="currentPage" :page-size="size" @prev-click="pageChange" @next-click="pageChange" @current-change="pageChange" />
   </div>
 </template>
 
@@ -113,7 +115,7 @@ export default {
   data() {
     return {
       list: null,
-      listLoading: true,
+      fullscreenLoading: false,
       // 分页设置
       total: null,
       currentPage: 1,
@@ -134,7 +136,7 @@ export default {
   },
   methods: {
     fetchData() {
-      this.listLoading = true
+      this.fullscreenLoading = true
       const params = {
         page: 1,
         size: this.size
@@ -143,11 +145,13 @@ export default {
         this.list = response.data
         this.total = response.total
       })
-      this.listLoading = false
+      setTimeout(() => {
+        this.fullscreenLoading = false
+      }, 500)
     },
 
     pageChange(val) {
-      this.listLoading = true
+      this.fullscreenLoading = true
       const params = {
         page: val,
         size: this.size
@@ -156,7 +160,9 @@ export default {
         this.list = response.data
         this.total = response.total
       })
-      this.listLoading = false
+      setTimeout(() => {
+        this.fullscreenLoading = false
+      }, 500)
     },
 
     showPassword(val) {
