@@ -137,7 +137,7 @@ export default {
   }
 }
 </script> -->
-<template>
+<!-- <template>
   <el-form ref="form" :model="form" :rules="rules" label-width="120px">
     <el-form-item label="姓名" prop="name">
       <el-input v-model="form.name" />
@@ -211,4 +211,39 @@ export default {
   }
 }
 </script>
+ -->
+<template>
+  <div>
+    <button :class="{'is-fetching': isFetching}" :disabled="isFetching" @click="fetchData">获取状态</button>
+  </div>
+</template>
 
+<script>
+export default {
+  data() {
+    return {
+      isFetching: false
+    }
+  },
+  methods: {
+    fetchData() {
+      if (this.isFetching) return
+      this.isFetching = true
+      // 发起请求
+      // ...
+      console.log(window.localStorage.getItem('username'))
+      // 请求结束
+      setTimeout(() => {
+        this.isFetching = false
+      }, 3000)
+    }
+  }
+}
+</script>
+
+<style>
+button.is-fetching {
+  background-color: #ccc; /* 改变背景颜色 */
+  cursor: not-allowed; /* 禁用鼠标点击事件 */
+}
+</style>
