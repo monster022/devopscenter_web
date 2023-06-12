@@ -64,6 +64,12 @@ export const constantRoutes = [
         name: 'Project',
         component: () => import('@/views/project/index'),
         meta: { title: 'Project', icon: 'el-icon-s-shop' }
+      },
+      {
+        path: 'detail/:project',
+        meta: { title: '构建详情页' },
+        component: () => import('@/views/detail/build/index'),
+        hidden: true
       }
     ]
   },

@@ -87,3 +87,12 @@ export function patchEdit(name, data) {
     data
   })
 }
+
+// 项目构建信息
+export function getProjectDetails(project, params) {
+  return request({
+    url: '/project/detail/' + project,
+    method: 'get',
+    params
+  })
+}

@@ -21,7 +21,8 @@
       </el-table-column>
       <el-table-column label="项目名" header-align="center" align="center">
         <template slot-scope="scope">
-          <font color="#409EFF">{{ scope.row.project_name }}</font>
+          <el-button :disabled="scope.row.project_status === 0" type="text" size="mini" @click="projectDetail(scope.row.project_name)">{{ scope.row.project_name }}</el-button>
+          <!-- <font color="#409EFF">{{ scope.row.project_name }}</font> -->
         </template>
       </el-table-column>
       <el-table-column label="语言" header-align="center" align="center">
@@ -377,7 +378,6 @@ export default {
       })
     },
     switchStatusEnable(val) {
-      console.log(val.project_status)
       const params = {
         status: 1,
         id: val.id
@@ -388,10 +388,11 @@ export default {
           message: response.message
         })
       })
-      this.fetchData()
+      setTimeout(() => {
+        this.fetchData()
+      }, 300)
     },
     switchStatusDisable(val) {
-      console.log(val.project_status)
       const params = {
         status: 0,
         id: val.id
@@ -402,7 +403,9 @@ export default {
           message: response.message
         })
       })
-      this.fetchData()
+      setTimeout(() => {
+        this.fetchData()
+      }, 300)
     },
     deleteProject(val) {
       console.log(val)
@@ -507,7 +510,8 @@ export default {
             dependent_branch: this.buildForm.dependent_branch,
             build_path: this.buildForm.build_path,
             package_name: this.buildForm.package_name,
-            image_source: this.buildForm.image_source
+            image_source: this.buildForm.image_source,
+            create_by: window.localStorage.getItem('username')
           }
           postJenkinsJobBuild(data).then(response => {
             this.$message({
@@ -521,6 +525,11 @@ export default {
         } else {
           return false
         }
+      })
+    },
+    projectDetail(val) {
+      this.$router.push({
+        path: '/project/detail/' + val
       })
     },
     deployOpen(row) {

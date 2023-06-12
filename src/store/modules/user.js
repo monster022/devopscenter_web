@@ -36,6 +36,7 @@ const actions = {
       login({ username: username, password: password }).then(response => {
         const { data } = { data: { token: response.data.token }}
         // const { data } = response
+        window.localStorage.setItem('username', username)
         commit('SET_TOKEN', data.token)
         setToken(data.token)
         resolve()
@@ -70,6 +71,7 @@ const actions = {
   logout({ commit, state }) {
     return new Promise((resolve, reject) => {
       logout(state.token).then(() => {
+        window.localStorage.clear()
         removeToken() // must remove  token  first
         resetRouter()
         commit('RESET_STATE')
