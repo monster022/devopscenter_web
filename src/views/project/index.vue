@@ -132,6 +132,7 @@
                 <el-option label="dev" value="dev" />
                 <el-option label="uat" value="uat" />
                 <el-option label="fat" value="fat" />
+                <el-option label="pro" value="pro" />
               </el-select>
             </el-form-item>
           </el-col>
@@ -213,6 +214,7 @@
                 <el-option label="dev" value="dev" />
                 <el-option label="uat" value="uat" />
                 <el-option label="fat" value="fat" />
+                <el-option label="pro" value="pro" />
               </el-select>
             </el-form-item>
           </el-col>
@@ -535,12 +537,6 @@ export default {
           this.intervalId = setInterval(() => {
             this.healthCheck(this.buildForm.language + '_Template', this.jobId)
           }, 1000)
-          // setTimeout(() => {
-          //   getJenkinsBuildStatus(this.buildForm.language + '_Template', this.jobId).then(response => {
-          //     console.log(this.buildForm.language + '_Template', this.jobId)
-          //     console.log(response)
-          //   })
-          // }, 10000)
         } else {
           return false
         }
