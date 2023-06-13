@@ -256,7 +256,7 @@
 
 <script>
 import { getNameSpaceList } from '@/api/namespace'
-import { getList, getBranch, getHarborTag, postJenkinsJobBuild, deleteList, postAddition, patchStatus, patchEdit } from '@/api/project'
+import { getList, getBranch, getHarborTag, postJenkinsJobBuild, deleteList, postAddition, patchStatus, patchEdit, getJenkinsBuildStatus } from '@/api/project'
 import { getSpecifyDeployMent, patchDeploymentImage } from '@/api/deployment'
 // import axios from 'axios'
 
@@ -265,6 +265,13 @@ export default {
     return {
       list: null,
       fullscreenLoading: false,
+      builddisable: 1,
+      // 定义jobid变量
+      jobId: 0,
+      // 心跳检查job状态
+      intervalId: null,
+      counter: 0,
+      maxCount: 600, // 最多请求600次，即10分钟
       // 分页设置
       total: null,
       size: 13,
@@ -518,10 +525,22 @@ export default {
               type: 'success',
               message: response.message
             })
+            this.jobId = response.data
+            console.log(response.data)
+            console.log(this.jobId)
           }).catch(err => {
             console.log(err)
           })
           this.buildDialogVisible = false
+          this.intervalId = setInterval(() => {
+            this.healthCheck(this.buildForm.language + '_Template', this.jobId)
+          }, 1000)
+          // setTimeout(() => {
+          //   getJenkinsBuildStatus(this.buildForm.language + '_Template', this.jobId).then(response => {
+          //     console.log(this.buildForm.language + '_Template', this.jobId)
+          //     console.log(response)
+          //   })
+          // }, 10000)
         } else {
           return false
         }
@@ -610,6 +629,20 @@ export default {
       }
       getSpecifyDeployMent(params, this.deployForm.name).then(response => {
         this.containirNameList = response.data
+      })
+    },
+    healthCheck(template, id) {
+      getJenkinsBuildStatus(template, id).then(response => {
+        if (response.data === 'SUCCESS' || response.data === 'ABORTED' || response.data === 'FAILURE') {
+          clearInterval(this.intervalId)
+        } else {
+          this.counter++
+          if (this.counter >= this.maxCount) {
+            clearInterval(this.intervalId)
+          }
+        }
+      }).catch(error => {
+        console.error(error)
       })
     }
   }

@@ -96,3 +96,10 @@ export function getProjectDetails(project, params) {
     params
   })
 }
+
+export function getJenkinsBuildStatus(project, id) {
+  return request({
+    url: '/jenkins/' + project + '/' + id,
+    method: 'get'
+  })
+}
