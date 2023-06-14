@@ -32,7 +32,8 @@
       </el-table-column>
       <el-table-column label="构建" header-align="center" align="center">
         <template slot-scope="{row}">
-          <el-button :disabled="row.project_status === 0" type="text" size="mini" @click="buildOpen(row)">build</el-button>
+          <!-- <el-button :disabled="row.project_status === 0" type="text" size="mini" @click="buildOpen(row)">build</el-button> -->
+          <el-button :disabled="buildType(row.id,row.project_status)" :class="{act: buildLoadingType(row.id)}" :loading="buildLoadingType(row.id)" type="text" size="mini" @click="buildOpen(row)">{{ buildWd(row.id) }}</el-button>
         </template>
       </el-table-column>
       <el-table-column label="发布" header-align="center" align="center">
@@ -265,6 +266,7 @@ import { getSpecifyDeployMent, patchDeploymentImage } from '@/api/deployment'
 export default {
   data() {
     return {
+      bId: '',				// 选定的id
       list: null,
       fullscreenLoading: false,
       builddisable: 1,
@@ -361,6 +363,27 @@ export default {
     this.fetchData()
   },
   methods: {
+    buildType(id, status) {
+      let bk = false
+      if (this.bId || status === 0) {
+        bk = true
+      }
+      return bk
+    },
+    buildLoadingType(id) {
+      let bk = false
+      if (id === this.bId) {
+        bk = true
+      }
+      return bk
+    },
+    buildWd(id) {
+      let bk = 'build'
+      if (id === this.bId) {
+        bk = 'running'
+      }
+      return bk
+    },
     fetchData() {
       this.fullscreenLoading = true
       const params = {
@@ -493,6 +516,7 @@ export default {
       getBranch(params).then(response => {
         this.branchList = response.data
       })
+      this.buildForm.id = row.id
       this.buildForm.name = row.project_name
       this.buildForm.repository = row.project_repo
       this.buildForm.language = row.language
@@ -523,6 +547,7 @@ export default {
             create_by: window.localStorage.getItem('username')
           }
           postJenkinsJobBuild(data).then(response => {
+            this.bId = this.buildForm.id
             this.$message({
               type: 'success',
               message: response.message
@@ -630,10 +655,20 @@ export default {
     healthCheck(template, id) {
       getJenkinsBuildStatus(template, id).then(response => {
         if (response.data === 'SUCCESS' || response.data === 'ABORTED' || response.data === 'FAILURE') {
+          this.bId = ''
+          this.$message({
+            type: 'success',
+            message: '构建状态为: ' + response.data
+          })
           clearInterval(this.intervalId)
         } else {
           this.counter++
           if (this.counter >= this.maxCount) {
+            this.bId = ''
+            this.$message({
+              type: 'info',
+              message: '已取消, 超时10分钟'
+            })
             clearInterval(this.intervalId)
           }
         }
@@ -651,9 +686,8 @@ export default {
     border-collapse: separate;
     /* border-spacing: 10px; */
   }
-
   .font-color {
     background: #2e90ff;
   }
-
+  .el-button.is-disabled.act { color: #409EFF; }
 </style>
