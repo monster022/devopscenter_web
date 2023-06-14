@@ -24,7 +24,7 @@ service.interceptors.request.use(
       // config.headers['X-Token'] = getToken()
       config.headers['Authorization'] = getToken()
     }
-    if (config.method === 'post') {
+    if (config.method === 'post' || config.method === 'patch') {
       config.headers['Content-Type'] = 'multipart/form-data'
     }
     return config
