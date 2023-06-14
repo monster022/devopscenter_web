@@ -23,3 +23,20 @@ export function deleteList(params) {
     params
   })
 }
+
+export function addMachine(data) {
+  return request({
+    url: '/machine',
+    method: 'post',
+    headers: { 'Content-Type': 'multipart/form-data' },
+    data
+  })
+}
+
+export function patchMachineName(id, params) {
+  return request({
+    url: '/machine/' + id,
+    method: 'patch',
+    params
+  })
+}
