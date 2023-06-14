@@ -28,7 +28,7 @@ export function patchDeploymentImage(data) {
   return request({
     url: '/deployment',
     method: 'patch',
-    headers: { 'Content-Type': 'multipart/form-data' },
+    // headers: { 'Content-Type': 'multipart/form-data' },
     data
   })
 }

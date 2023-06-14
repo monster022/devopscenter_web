@@ -12,7 +12,7 @@ export function login(data) {
   return request({
     url: '/login',
     method: 'post',
-    headers: { 'Content-Type': 'multipart/form-data' },
+    // headers: { 'Content-Type': 'multipart/form-data' },
     data
   })
 }

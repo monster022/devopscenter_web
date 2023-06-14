@@ -36,6 +36,7 @@ const actions = {
       login({ username: username, password: password }).then(response => {
         const { data } = { data: { token: response.data.token }}
         // const { data } = response
+        window.localStorage.setItem('token', response.data.token)
         window.localStorage.setItem('username', username)
         commit('SET_TOKEN', data.token)
         setToken(data.token)

@@ -28,7 +28,7 @@ export function addMachine(data) {
   return request({
     url: '/machine',
     method: 'post',
-    headers: { 'Content-Type': 'multipart/form-data' },
+    // headers: { 'Content-Type': 'multipart/form-data' },
     data
   })
 }
