@@ -6,10 +6,9 @@
 
     <div class="right-menu">
       <el-dropdown class="avatar-container" trigger="click">
-        <div class="avatar-wrapper">
-          <img :src="avatar+'?imageView2/1/w/80/h/80'" class="user-avatar">
-          <i class="el-icon-caret-bottom" />
-        </div>
+        <span id="username-container" class="avatar-wrapper">
+          {{ username }} <i class="el-icon-arrow-down" />
+        </span>
         <el-dropdown-menu slot="dropdown" class="user-dropdown">
           <router-link to="/">
             <el-dropdown-item>
@@ -31,6 +30,12 @@
   </div>
 </template>
 
+        <!-- <div class="avatar-wrapper">
+          <img src="@/assets/images/title.gif" class="user-avatar">
+
+          <i class="el-icon-caret-bottom" />
+        </div> -->
+
 <script>
 import { mapGetters } from 'vuex'
 import Breadcrumb from '@/components/Breadcrumb'
@@ -40,6 +45,11 @@ export default {
   components: {
     Breadcrumb,
     Hamburger
+  },
+  data() {
+    return {
+      username: localStorage.getItem('username')
+    }
   },
   computed: {
     ...mapGetters([
@@ -129,11 +139,14 @@ export default {
           cursor: pointer;
           position: absolute;
           right: -20px;
-          top: 25px;
+          top: 10px;
           font-size: 12px;
         }
       }
     }
   }
 }
+  .right-menu:hover {
+    cursor: pointer;
+  }
 </style>
