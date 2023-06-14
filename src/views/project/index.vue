@@ -380,7 +380,7 @@ export default {
     buildWd(id) {
       let bk = 'build'
       if (id === this.bId) {
-        bk = 'running'
+        bk = 'Running'
       }
       return bk
     },
