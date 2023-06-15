@@ -5,17 +5,17 @@
         <div class="grid-content bg-purple-dark" />
       </el-col>
     </el-row>
-    <div>
+    <div class="change-password-container">
       <el-form ref="passwordForm" :model="passwordData" :rules="passwordRules" class="password-form">
         <h2 class="password-title">修改密码</h2>
         <el-form-item prop="currentPassword">
           <el-input v-model="passwordData.currentPassword" :show-password="showPassword" placeholder="当前密码" type="password" />
         </el-form-item>
         <el-form-item prop="newPassword">
-          <el-input v-model="passwordData.newPassword" placeholder="新密码" type="password" />
+          <el-input v-model="passwordData.newPassword" :show-password="showPassword" placeholder="新密码" type="password" />
         </el-form-item>
         <el-form-item prop="confirmPassword">
-          <el-input v-model="passwordData.confirmPassword" placeholder="确认密码" type="password" />
+          <el-input v-model="passwordData.confirmPassword" :show-password="showPassword" placeholder="确认密码" type="password" />
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="changePassword">修改密码</el-button>
@@ -33,7 +33,7 @@ import router from '@/router'
 export default {
   data() {
     return {
-      showPassword: false,
+      showPassword: true,
       passwordData: {
         currentPassword: '',
         newPassword: '',
