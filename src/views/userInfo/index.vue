@@ -65,15 +65,24 @@ export default {
             confirmPassword: this.passwordData.confirmPassword
           }
           changePassword(data).then(response => {
-            this.$message({
-              type: 'success',
-              message: 'Change Password ' + response.message + ', Please Relogin'
-            })
+            if (response.data === true) {
+              console.log('xxxx')
+              this.$message({
+                type: 'success',
+                message: 'Change Password ' + response.message + ', Please Relogin'
+              })
+              setTimeout(() => {
+                document.cookie = 'vue_admin_template_token' + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/'
+                router.push('/')
+              }, 1000)
+            } else {
+              console.log('qqqq')
+              this.$message({
+                type: 'warning',
+                message: 'Change Password ' + response.message + ', Please Check Current Password'
+              })
+            }
           })
-          setTimeout(() => {
-            document.cookie = 'vue_admin_template_token' + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/'
-            router.push('/')
-          }, 1000)
           console.log('密码修改成功')
         } else {
           console.log('表单校验失败')
@@ -87,10 +96,10 @@ export default {
       } else {
         callback()
       }
-    },
-    toggleShowPassword() {
-      this.showPassword = !this.showPassword
     }
+    // toggleShowPassword() {
+    //   this.showPassword = !this.showPassword
+    // }
   }
 }
 </script>
