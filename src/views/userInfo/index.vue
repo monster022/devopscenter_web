@@ -5,11 +5,11 @@
         <div class="grid-content bg-purple-dark" />
       </el-col>
     </el-row>
-    <div class="change-password-container">
+    <div>
       <el-form ref="passwordForm" :model="passwordData" :rules="passwordRules" class="password-form">
         <h2 class="password-title">修改密码</h2>
         <el-form-item prop="currentPassword">
-          <el-input v-model="passwordData.currentPassword" placeholder="当前密码" type="password" />
+          <el-input v-model="passwordData.currentPassword" :show-password="showPassword" placeholder="当前密码" type="password" />
         </el-form-item>
         <el-form-item prop="newPassword">
           <el-input v-model="passwordData.newPassword" placeholder="新密码" type="password" />
@@ -26,9 +26,14 @@
 </template>
 
 <script>
+
+import { changePassword } from '@/api/user'
+import router from '@/router'
+
 export default {
   data() {
     return {
+      showPassword: false,
       passwordData: {
         currentPassword: '',
         newPassword: '',
@@ -53,6 +58,22 @@ export default {
       this.$refs.passwordForm.validate((valid) => {
         if (valid) {
           // 执行修改密码逻辑
+          const data = {
+            username: localStorage.getItem('username'),
+            currentPassword: this.passwordData.currentPassword,
+            newPassword: this.passwordData.newPassword,
+            confirmPassword: this.passwordData.confirmPassword
+          }
+          changePassword(data).then(response => {
+            this.$message({
+              type: 'success',
+              message: 'Change Password ' + response.message + ', Please Relogin'
+            })
+          })
+          setTimeout(() => {
+            document.cookie = 'vue_admin_template_token' + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/'
+            router.push('/')
+          }, 1000)
           console.log('密码修改成功')
         } else {
           console.log('表单校验失败')
@@ -66,6 +87,9 @@ export default {
       } else {
         callback()
       }
+    },
+    toggleShowPassword() {
+      this.showPassword = !this.showPassword
     }
   }
 }
@@ -94,5 +118,16 @@ export default {
   .card-background {
     background: #fafaf6;
   }
+
+  .eye-icon {
+  position: absolute;
+  top: 38px;
+  right: 10px;
+  cursor: pointer;
+}
+
+.eye-icon:hover {
+  color: #409EFF;
+}
 
 </style>
