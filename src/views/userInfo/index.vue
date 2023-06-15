@@ -66,7 +66,6 @@ export default {
           }
           changePassword(data).then(response => {
             if (response.data === true) {
-              console.log('xxxx')
               this.$message({
                 type: 'success',
                 message: 'Change Password ' + response.message + ', Please Relogin'
@@ -76,7 +75,6 @@ export default {
                 router.push('/')
               }, 1000)
             } else {
-              console.log('qqqq')
               this.$message({
                 type: 'warning',
                 message: 'Change Password ' + response.message + ', Please Check Current Password'
@@ -120,23 +118,23 @@ export default {
     margin-bottom: 20px;
   }
 
+  .grid-content {
+    min-height: 36px;
+  }
+
   .bg-purple-dark {
     background: #99a9bf;
   }
 
-  .card-background {
-    background: #fafaf6;
+  .eye-icon {
+    position: absolute;
+    top: 38px;
+    right: 10px;
+    cursor: pointer;
   }
 
-  .eye-icon {
-  position: absolute;
-  top: 38px;
-  right: 10px;
-  cursor: pointer;
-}
-
-.eye-icon:hover {
-  color: #409EFF;
-}
+  .eye-icon:hover {
+    color: #409EFF;
+  }
 
 </style>
