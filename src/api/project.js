@@ -22,7 +22,7 @@ export function postAddition(data) {
   return request({
     url: '/project',
     method: 'post',
-    headers: { 'Content-Type': 'multipart/form-data' },
+    // headers: { 'Content-Type': 'multipart/form-data' },
     data
   })
 }
@@ -41,7 +41,7 @@ export function postJenkinsJobBuild(data) {
   return request({
     url: '/jenkins/job',
     method: 'post',
-    headers: { 'Content-Type': 'multipart/form-data' },
+    // headers: { 'Content-Type': 'multipart/form-data' },
     data
   })
 }
@@ -83,7 +83,7 @@ export function patchEdit(name, data) {
   return request({
     url: '/project/' + name,
     method: 'patch',
-    headers: { 'Content-Type': 'multipart/form-data' },
+    // headers: { 'Content-Type': 'multipart/form-data' },
     data
   })
 }

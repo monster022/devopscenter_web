@@ -88,6 +88,19 @@ export const constantRoutes = [
   },
 
   {
+    path: '/user',
+    component: Layout,
+    children: [
+      {
+        path: 'info',
+        meta: { title: '用户中心' },
+        component: () => import('@/views/userInfo/index'),
+        hidden: true
+      }
+    ]
+  },
+
+  {
     path: '/kubernetes',
     component: Layout,
     redirect: '/kubernetes/table',

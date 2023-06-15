@@ -12,7 +12,7 @@ export function login(data) {
   return request({
     url: '/login',
     method: 'post',
-    headers: { 'Content-Type': 'multipart/form-data' },
+    // headers: { 'Content-Type': 'multipart/form-data' },
     data
   })
 }
@@ -29,5 +29,13 @@ export function logout() {
   return request({
     url: '/vue-admin-template/user/logout',
     method: 'post'
+  })
+}
+
+export function changePassword(data) {
+  return request({
+    url: '/password',
+    method: 'post',
+    data
   })
 }
