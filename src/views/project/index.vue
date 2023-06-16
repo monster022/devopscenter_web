@@ -188,7 +188,7 @@
         </el-form-item>
         <el-form-item label="镜像源" label-width="80px" prop="image_source">
           <el-select v-model="buildForm.image_source" style="width: 425px;" placeholder="请选择镜像版本">
-            <el-option label="Dotnet Frame 5.0" value="harbor.chengdd.cn/base/dotnet_aspnet_tlsv1.0:5.0" />
+            <el-option label="Dotnet Frame 5.0" value="harbor.chengdd.cn/base/dotnet_aspnet:5.0" />
             <el-option label="Dotnet Frame 2.2" value="harbor.chengdd.cn/base/dotnet_aspnet:2.2" />
             <el-option label="Nginx Version 1.20" value="harbor.chengdd.cn/base/nginx:1.20" />
             <el-option label="Golang Version alpine" value="golang:alpine" />
