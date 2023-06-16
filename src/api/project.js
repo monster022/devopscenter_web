@@ -97,9 +97,19 @@ export function getProjectDetails(project, params) {
   })
 }
 
+// 获取 Jenkins 构建状态
 export function getJenkinsBuildStatus(project, id) {
   return request({
     url: '/jenkins/' + project + '/' + id,
     method: 'get'
+  })
+}
+
+// 获取项目的提交信息
+export function getProjectCommitMessage(pid, params) {
+  return request({
+    url: '/project/' + pid + '/commit',
+    method: 'get',
+    params
   })
 }
