@@ -22,6 +22,7 @@
         </el-form-item>
       </el-form>
     </div>
+    <el-calendar v-model="value" class="calendar" />
   </div>
 </template>
 
@@ -33,6 +34,7 @@ import router from '@/router'
 export default {
   data() {
     return {
+      value: new Date(),
       showPassword: true,
       passwordData: {
         currentPassword: '',
@@ -95,18 +97,17 @@ export default {
         callback()
       }
     }
-    // toggleShowPassword() {
-    //   this.showPassword = !this.showPassword
-    // }
   }
 }
 </script>
 
 <style>
   .change-password-container {
+    float: right;
     display: flex;
-    margin-left: 50px;
-    height: 100vh;
+    margin-right: 300px;
+    /* height: 400px; */
+    width: 300px;
   }
 
   .password-form {
@@ -135,6 +136,11 @@ export default {
 
   .eye-icon:hover {
     color: #409EFF;
+  }
+
+  .calendar {
+    float: left;
+    width: 800px;
   }
 
 </style>

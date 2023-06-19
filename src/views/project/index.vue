@@ -141,9 +141,36 @@
         <el-form-item label="仓库地址" label-width="80px">
           <el-input v-model="buildForm.repository" style="width: 425px;" :disabled="true" />
         </el-form-item>
-        <el-form-item v-if="buildForm.language === 'dotnet5.0' || buildForm.language === 'dotnet2.2'" label="是否依赖" label-width="90px">
-          <el-switch v-model="buildForm.depend" />
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="分支" label-width="80px" prop="branch">
+              <el-select v-model="buildForm.branch" style="width: 150px;" placeholder="请选择分支" @change="branchChangeCommit()">
+                <el-option v-for="(item, index) in branchList" :key="index" :label="item.name" :value="item.name" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="作者" label-width="80px">
+              <el-input v-model="buildForm.authorName" style="width: 150px;" :disabled="true" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-form-item label="提交信息" label-width="80px">
+          <el-input v-model="buildForm.message" style="width: 425px;" :disabled="true" />
         </el-form-item>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item v-if="buildForm.language === 'dotnet5.0' || buildForm.language === 'dotnet2.2'" label="是否依赖" label-width="90px">
+              <el-switch v-model="buildForm.depend" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item v-if="buildForm.language === 'dotnet5.0' || buildForm.language === 'dotnet2.2'" label="是否包含子项目" label-width="180px">
+              <!--el-input v-model="buildForm.sub_name" style="width: 150px;" placeholder="一个项目包含多个子项目时填写" /-->
+              <el-switch v-model="buildForm.include_subname" />
+            </el-form-item>
+          </el-col>
+        </el-row>
         <el-row>
           <el-col :span="12">
             <el-form-item v-if="buildForm.depend === true" label="依赖名" label-width="80px">
@@ -162,21 +189,6 @@
         <el-form-item v-if="buildForm.depend === true" label="依赖仓库" label-width="80px">
           <el-input v-model="buildForm.dependent_repository" style="width: 425px;" :disabled="true" />
         </el-form-item>
-        <el-row>
-          <el-col :span="12">
-            <el-form-item label="分支" label-width="80px" prop="branch">
-              <el-select v-model="buildForm.branch" style="width: 150px;" placeholder="请选择分支">
-                <el-option v-for="(item, index) in branchList" :key="index" :label="item.name" :value="item.name" />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item v-if="buildForm.language === 'dotnet5.0' || buildForm.language === 'dotnet2.2'" label="是否包含子项目" label-width="150px">
-              <!--el-input v-model="buildForm.sub_name" style="width: 150px;" placeholder="一个项目包含多个子项目时填写" /-->
-              <el-switch v-model="buildForm.include_subname" />
-            </el-form-item>
-          </el-col>
-        </el-row>
         <el-form-item v-if="buildForm.include_subname === true" label="子名称" label-width="80px">
           <el-input v-model="buildForm.sub_name" style="width: 425px;" placeholder="一个项目包含多个子项目时填写" />
         </el-form-item>
@@ -188,7 +200,7 @@
         </el-form-item>
         <el-form-item label="镜像源" label-width="80px" prop="image_source">
           <el-select v-model="buildForm.image_source" style="width: 425px;" placeholder="请选择镜像版本">
-            <el-option label="Dotnet Frame 5.0" value="harbor.chengdd.cn/base/dotnet_aspnet_tlsv1.0:5.0" />
+            <el-option label="Dotnet Frame 5.0" value="harbor.chengdd.cn/base/dotnet_aspnet:5.0" />
             <el-option label="Dotnet Frame 2.2" value="harbor.chengdd.cn/base/dotnet_aspnet:2.2" />
             <el-option label="Nginx Version 1.20" value="harbor.chengdd.cn/base/nginx:1.20" />
             <el-option label="Golang Version alpine" value="golang:alpine" />
@@ -259,7 +271,7 @@
 
 <script>
 import { getNameSpaceList } from '@/api/namespace'
-import { getList, getBranch, getHarborTag, postJenkinsJobBuild, deleteList, postAddition, patchStatus, patchEdit, getJenkinsBuildStatus } from '@/api/project'
+import { getList, getBranch, getHarborTag, postJenkinsJobBuild, deleteList, postAddition, patchStatus, patchEdit, getJenkinsBuildStatus, getProjectCommitMessage } from '@/api/project'
 import { getSpecifyDeployMent, patchDeploymentImage } from '@/api/deployment'
 // import axios from 'axios'
 
@@ -320,7 +332,10 @@ export default {
         package_name: '',
         image_source: '',
         include_subname: false,
-        depend: false
+        depend: false,
+        authorName: '',
+        message: '', // commit information
+        pid: null // 项目ID
       },
       // 发布状态与数据
       deployDialogVisible: false,
@@ -526,7 +541,19 @@ export default {
       this.buildForm.branch = ''
       this.buildForm.sub_name = ''
       this.buildForm.image_source = ''
+      this.buildForm.authorName = ''
+      this.buildForm.message = ''
+      this.buildForm.pid = row.project_id
       this.buildDialogVisible = true
+    },
+    branchChangeCommit() {
+      const params = {
+        branch: this.buildForm.branch
+      }
+      getProjectCommitMessage(this.buildForm.pid, params).then(response => {
+        this.buildForm.authorName = response.data.authorName
+        this.buildForm.message = response.data.message
+      })
     },
     buildSubmit(formName) {
       this.$refs[formName].validate((valid) => {
