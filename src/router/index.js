@@ -46,7 +46,7 @@ export const constantRoutes = [
   {
     path: '/',
     component: Layout,
-    redirect: '/dashboard',
+    redirect: '/project/index',
     children: [{
       path: 'dashboard',
       name: 'Dashboard',
@@ -61,7 +61,6 @@ export const constantRoutes = [
     children: [
       {
         path: 'index',
-        name: 'Project',
         component: () => import('@/views/project/index'),
         meta: { title: 'Project', icon: 'el-icon-s-shop' }
       },
@@ -80,7 +79,6 @@ export const constantRoutes = [
     children: [
       {
         path: 'index',
-        name: 'Machine',
         component: () => import('@/views/machine/index'),
         meta: { title: 'Machine', icon: 'el-icon-cpu' }
       }

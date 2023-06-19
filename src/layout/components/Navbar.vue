@@ -10,11 +10,11 @@
           {{ username }} <i class="el-icon-arrow-down" />
         </span>
         <el-dropdown-menu slot="dropdown" class="user-dropdown">
-          <router-link to="/">
+          <!-- <router-link to="/">
             <el-dropdown-item>
               Dashboard
             </el-dropdown-item>
-          </router-link>
+          </router-link> -->
           <router-link to="/user/info">
             <el-dropdown-item>
               User center
