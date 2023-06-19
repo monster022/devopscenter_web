@@ -132,25 +132,6 @@ export const constantRoutes = [
         component: () => import('@/views/kubernetes/deployment/index'),
         meta: { title: 'CronJob', icon: '' }
       }
-
-      // {
-      //   path: 'prd',
-      //   name: 'Prd',
-      //   component: () => import('@/views/kubernetes/prd/index'),
-      //   meta: { title: 'Prd', icon: 'el-icon-dessert' }
-      // },
-      // {
-      //   path: 'old',
-      //   name: 'Old',
-      //   component: () => import('@/views/kubernetes/old/index'),
-      //   meta: { title: 'Old', icon: 'el-icon-dessert' }
-      // },
-      // {
-      //   path: 'struct',
-      //   name: 'Struct',
-      //   component: () => import('@/views/kubernetes/struct/index'),
-      //   meta: { title: 'Struct', icon: 'el-icon-dessert' }
-      // }
     ]
   },
 
