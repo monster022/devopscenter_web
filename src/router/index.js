@@ -91,8 +91,20 @@ export const constantRoutes = [
     children: [
       {
         path: 'info',
-        meta: { title: '用户中心' },
+        meta: { title: 'UserCenter' },
         component: () => import('@/views/userInfo/index'),
+        hidden: true
+      }
+    ]
+  },
+  {
+    path: '/order',
+    component: Layout,
+    children: [
+      {
+        path: 'info',
+        meta: { title: 'OrderCenter' },
+        component: () => import('@/views/order/index'),
         hidden: true
       }
     ]

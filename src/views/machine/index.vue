@@ -49,7 +49,7 @@
       </el-table-column>
       <el-table-column label="标签" header-align="center" align="center">
         <template slot-scope="scope">
-          <el-tag :type="scope.row.instance_tag | tagFilter">{{ scope.row.instance_tag }}</el-tag>
+          <el-tag size="mini" :type="scope.row.instance_tag | tagFilter">{{ scope.row.instance_tag }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column
