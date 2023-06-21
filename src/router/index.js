@@ -84,6 +84,17 @@ export const constantRoutes = [
       }
     ]
   },
+  {
+    path: '/webshell',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/webshell/index'),
+        meta: { title: 'webshell' }
+      }
+    ]
+  },
 
   {
     path: '/user',
