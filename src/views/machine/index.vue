@@ -161,7 +161,7 @@
 
     <!-- terminal -->
     <el-dialog :visible.sync="openTerminalDialogVisible" width="800px" :title="'Terminal'">
-      <Terminal :hostname="hostName" />
+      <Terminal :hostname="hostName" :ip="instanceIp" :name="instanceUsername" />
     </el-dialog>
 
   </div>
@@ -224,7 +224,9 @@ export default {
       },
       // 子组件使用数据
       openTerminalDialogVisible: false,
-      hostName: ''
+      hostName: '',
+      instanceIp: '',
+      instanceUsername: ''
     }
   },
   created() {
@@ -366,6 +368,8 @@ export default {
     },
 
     openTerminal(val) {
+      this.instanceIp = val.instance_ip
+      this.instanceUsername = val.instance_username
       this.hostName = '[' + val.instance_username + '@' + val.instance_ip + '_' + val.instance_name + ' ~]# '
       this.openTerminalDialogVisible = true
     }
