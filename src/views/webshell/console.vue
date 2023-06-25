@@ -19,13 +19,13 @@ export default {
       disableStdin: false, // 是否应禁用输入
       windowsMode: true, // 根据窗口换行
       cursorStyle: 'underline', // 光标样式
-      cursorBlink: true, // 光标闪烁
-      theme: {
-        foreground: '#000000', // 字体
-        background: '#FFFFF0', // 背景色
-        cursor: 'help', // 设置光标
-        lineHeight: 20
-      }
+      cursorBlink: true // 光标闪烁
+      // theme: {
+      //   foreground: '#000000', // 字体
+      //   background: '#FFFFF0', // 背景色
+      //   cursor: 'help', // 设置光标
+      //   lineHeight: 20
+      // }
     })
     term.open(this.$refs.terminal)
 
@@ -34,10 +34,30 @@ export default {
       term.writeln('[root@127.0.0.1 ~]$ ')
     }
     socket.onmessage = (event) => {
-      term.writeln('[root@127.0.0.1 ~]$ ' + event.data)
+      term.writeln('[root@127.0.0.1 ~]$ \n' + event.data)
     }
-    term.onData((data) => {
-      socket.send(data)
+    // term.onData((data) => {
+    //   socket.send(data)
+    // })
+    let str01 = ''
+    let str02 = ''
+    term.onKey(e => {
+      // 获取键盘输入的字符
+      const char = e.key
+      str01 = str01 + char
+      // 判断是否为回车键
+      if (char === '\r' || char === '\n') {
+        str02 = str01
+        str01 = ''
+        // console.log(str02)
+        // 执行回车操作，比如发送命令
+        term.write('\r\n')
+        // 提交接口信息
+        socket.send(str02)
+      } else {
+        // 将字符写入终端
+        term.write(char)
+      }
     })
   }
 }

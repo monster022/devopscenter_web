@@ -24,13 +24,7 @@ export default {
       disableStdin: false,
       windowsMode: true,
       cursorStyle: 'underline',
-      cursorBlink: true,
-      theme: {
-        foreground: '#000000',
-        background: '#FFFFF0',
-        cursor: 'help',
-        lineHeight: 20
-      }
+      cursorBlink: true
     })
     term.open(this.$refs.terminal)
 
@@ -41,8 +35,19 @@ export default {
     socket.onmessage = (event) => {
       term.writeln(this.hostname + event.data)
     }
-    term.onData((data) => {
-      socket.send(data)
+    let str01 = ''
+    let str02 = ''
+    term.onKey(e => {
+      const char = e.key
+      str01 = str01 + char
+      if (char === '\r' || char === '\n') {
+        str02 = str01
+        str01 = ''
+        term.write('\r\n')
+        socket.send(str02)
+      } else {
+        term.write(char)
+      }
     })
   }
 }
