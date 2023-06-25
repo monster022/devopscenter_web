@@ -10,7 +10,7 @@
           {{ username }} <i class="el-icon-arrow-down" />
         </span>
         <el-dropdown-menu slot="dropdown" class="user-dropdown">
-          <router-link to="/">
+          <router-link to="/dashboard">
             <el-dropdown-item>
               Dashboard
             </el-dropdown-item>
@@ -26,6 +26,10 @@
         </el-dropdown-menu>
       </el-dropdown>
     </div>
+    <div class="right-menu">
+      <el-button type="text" size="mini" @click="orderButton()">To-Do List</el-button>
+      <el-badge :value="tackleOrderTotal" class="item" />
+    </div>
   </div>
 </template>
 
@@ -33,6 +37,7 @@
 import { mapGetters } from 'vuex'
 import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
+import { getTackleNameTotal } from '@/api/order'
 
 export default {
   components: {
@@ -41,7 +46,8 @@ export default {
   },
   data() {
     return {
-      username: localStorage.getItem('username')
+      username: localStorage.getItem('username'),
+      tackleOrderTotal: 0
     }
   },
   computed: {
@@ -50,7 +56,19 @@ export default {
       'avatar'
     ])
   },
+  created() {
+    this.fetchData()
+  },
   methods: {
+    fetchData() {
+      getTackleNameTotal().then(response => {
+        this.tackleOrderTotal = response.data
+      })
+    },
+    orderButton() {
+      // router.push('/order/info')
+      this.$router.push('/order/info')
+    },
     toggleSideBar() {
       this.$store.dispatch('app/toggleSideBar')
     },
@@ -135,8 +153,16 @@ export default {
         }
       }
     }
+
   }
   .right-menu:hover {
     cursor: pointer;
+  }
+</style>
+
+<style>
+  .item {
+    /* margin-bottom: 1px; */
+    margin-right: 20px;
   }
 </style>

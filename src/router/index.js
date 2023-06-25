@@ -46,7 +46,7 @@ export const constantRoutes = [
   {
     path: '/',
     component: Layout,
-    redirect: '/dashboard',
+    redirect: '/project/index',
     children: [{
       path: 'dashboard',
       name: 'Dashboard',
@@ -61,7 +61,6 @@ export const constantRoutes = [
     children: [
       {
         path: 'index',
-        name: 'Project',
         component: () => import('@/views/project/index'),
         meta: { title: 'Project', icon: 'el-icon-s-shop' }
       },
@@ -80,9 +79,19 @@ export const constantRoutes = [
     children: [
       {
         path: 'index',
-        name: 'Machine',
         component: () => import('@/views/machine/index'),
         meta: { title: 'Machine', icon: 'el-icon-cpu' }
+      }
+    ]
+  },
+  {
+    path: '/webshell',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        component: () => import('@/views/webshell/index'),
+        meta: { title: 'webshell' }
       }
     ]
   },
@@ -93,82 +102,59 @@ export const constantRoutes = [
     children: [
       {
         path: 'info',
-        meta: { title: '用户中心' },
+        meta: { title: 'UserCenter' },
         component: () => import('@/views/userInfo/index'),
         hidden: true
       }
     ]
   },
+  {
+    path: '/order',
+    component: Layout,
+    children: [
+      {
+        path: 'info',
+        meta: { title: 'OrderCenter' },
+        component: () => import('@/views/order/index'),
+        hidden: true
+      }
+    ]
+  },
   // 暂不显示
-  // {
-  //   path: '/kubernetes',
-  //   component: Layout,
-  //   redirect: '/kubernetes/table',
-  //   name: 'Kubernetes',
-  //   meta: { title: 'Kubernetes', icon: 'el-icon-cloudy' },
-  //   children: [
-  //     {
-  //       path: 'dev',
-  //       name: 'Dev',
-  //       component: () => import('@/views/kubernetes/dev/index'),
-  //       meta: { title: 'Dev', icon: 'el-icon-hot-water' }
-  //     },
-  //     {
-  //       path: 'fat',
-  //       name: 'Fat',
-  //       component: () => import('@/views/kubernetes/fat/index'),
-  //       meta: { title: 'Fat', icon: 'el-icon-ice-cream' }
-  //     },
-  //     // {
-  //     //   path: 'office',
-  //     //   name: 'Office',
-  //     //   component: () => import('@/views/kubernetes/office/index'),
-  //     //   meta: { title: 'Office', icon: 'el-icon-dessert' }
-  //     // },
-  //     {
-  //       path: 'deployment',
-  //       name: 'DeployMent',
-  //       component: () => import('@/views/kubernetes/deployment/index'),
-  //       meta: { title: '工作负载', icon: '' }
-  //     },
-  //     {
-  //       path: 'service',
-  //       name: 'Service',
-  //       component: () => import('@/views/kubernetes/deployment/index'),
-  //       meta: { title: '服务发现', icon: '' }
-  //     },
-  //     {
-  //       path: 'ingress',
-  //       name: 'Ingress',
-  //       component: () => import('@/views/kubernetes/deployment/index'),
-  //       meta: { title: '负载均衡', icon: '' }
-  //     },
-  //     {
-  //       path: 'cronjob',
-  //       name: 'CronJob',
-  //       component: () => import('@/views/kubernetes/deployment/index'),
-  //       meta: { title: '定时任务', icon: '' }
-  //     }
-  //     // {
-  //     //   path: 'prd',
-  //     //   name: 'Prd',
-  //     //   component: () => import('@/views/kubernetes/prd/index'),
-  //     //   meta: { title: 'Prd', icon: 'el-icon-dessert' }
-  //     // },
-  //     // {
-  //     //   path: 'old',
-  //     //   name: 'Old',
-  //     //   component: () => import('@/views/kubernetes/old/index'),
-  //     //   meta: { title: 'Old', icon: 'el-icon-dessert' }
-  //     // },
-  //     // {
-  //     //   path: 'struct',
-  //     //   name: 'Struct',
-  //     //   component: () => import('@/views/kubernetes/struct/index'),
-  //     //   meta: { title: 'Struct', icon: 'el-icon-dessert' }
-  //     // }
-  //   ]
-  // },
+  {
+    path: '/kubernetes',
+    component: Layout,
+    redirect: '/kubernetes/table',
+    name: 'Kubernetes',
+    meta: { title: 'Kubernetes', icon: 'el-icon-cloudy' },
+    children: [
+      {
+        path: 'deployment',
+        component: () => import('@/views/kubernetes/deployment/index'),
+        meta: { title: 'DeployMent', icon: '' }
+      },
+      {
+        path: 'configmap',
+        component: () => import('@/views/kubernetes/deployment/index'),
+        meta: { title: 'ConfigMap', icon: '' }
+      },
+      {
+        path: 'service',
+        component: () => import('@/views/kubernetes/deployment/index'),
+        meta: { title: 'Service', icon: '' }
+      },
+      {
+        path: 'ingress',
+        component: () => import('@/views/kubernetes/deployment/index'),
+        meta: { title: 'Ingress', icon: '' }
+      },
+      {
+        path: 'cronjob',
+        component: () => import('@/views/kubernetes/deployment/index'),
+        meta: { title: 'CronJob', icon: '' }
+      }
+    ]
+  },
 
   // {
   //   path: '/example',

@@ -49,16 +49,17 @@
       </el-table-column>
       <el-table-column label="标签" header-align="center" align="center">
         <template slot-scope="scope">
-          <el-tag :type="scope.row.instance_tag | tagFilter">{{ scope.row.instance_tag }}</el-tag>
+          <el-tag size="mini" :type="scope.row.instance_tag | tagFilter">{{ scope.row.instance_tag }}</el-tag>
         </template>
       </el-table-column>
       <el-table-column
         fixed="right"
         label="操作"
-        width="200"
+        width="300"
         header-align="center"
       >
         <template slot-scope="{row}">
+          <el-button v-if="row.instance_tag === 'CentOS' || row.instance_tag === 'Rancher'" type="text" size="small" icon="el-icon-monitor" @click="openTerminal(row)">终端</el-button>
           <el-button type="text" size="small" icon="el-icon-view" @click="showPassword(row)">查看密码</el-button>
           <el-button type="text" size="small" icon="el-icon-edit" @click="openConfiguration(row)">编辑</el-button>
           <el-button type="text" size="small" icon="el-icon-delete" @click="deleteMachine(row)">删除</el-button>
@@ -158,13 +159,22 @@
       </div>
     </el-dialog>
 
+    <!-- terminal -->
+    <el-dialog :visible.sync="openTerminalDialogVisible" width="800px" :title="'Terminal'">
+      <Terminal :hostname="hostName" />
+    </el-dialog>
+
   </div>
 </template>
 
 <script>
 import { getList, getPassWordList, deleteList, addMachine, patchMachineName } from '@/api/machine'
+import Terminal from './console.vue'
 
 export default {
+  components: {
+    Terminal
+  },
   filters: {
     tagFilter(tag) {
       const tagMap = {
@@ -211,7 +221,10 @@ export default {
         instance_cpu: [{ required: true, message: '必须选择CPU数', trigger: 'blur' }],
         instance_memory: [{ required: true, message: '必须输入内存数', trigger: 'blur' }],
         instance_tag: [{ required: true, message: '必须输入标签', trigger: 'blur' }]
-      }
+      },
+      // 子组件使用数据
+      openTerminalDialogVisible: false,
+      hostName: ''
     }
   },
   created() {
@@ -350,6 +363,11 @@ export default {
           message: '已取消删除'
         })
       })
+    },
+
+    openTerminal(val) {
+      this.hostName = '[' + val.instance_username + '@' + val.instance_ip + '_' + val.instance_name + ' ~]# '
+      this.openTerminalDialogVisible = true
     }
   }
 }
