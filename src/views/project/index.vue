@@ -20,10 +20,16 @@
           {{ scope.row.id }}
         </template>
       </el-table-column>
-      <el-table-column label="项目名" header-align="center" align="center">
+      <el-table-column label="项目" header-align="center" align="center">
         <template slot-scope="scope">
-          <el-button :disabled="scope.row.project_status === 0" type="text" size="mini" @click="projectDetail(scope.row.project_name)">{{ scope.row.project_name }}</el-button>
+          {{ scope.row.project_name }}
+          <!-- <el-button :disabled="scope.row.project_status === 0" type="text" size="mini" @click="projectDetail(scope.row.project_name)">{{ scope.row.project_name }}</el-button> -->
           <!-- <font color="#409EFF">{{ scope.row.project_name }}</font> -->
+        </template>
+      </el-table-column>
+      <el-table-column label="名称" header-align="center" align="center">
+        <template slot-scope="scope">
+          <el-button :disabled="scope.row.project_status === 0" type="text" size="mini" @click="projectDetail(scope.row.alias_name)">{{ scope.row.alias_name }}</el-button>
         </template>
       </el-table-column>
       <el-table-column label="语言" header-align="center" align="center">
@@ -64,8 +70,11 @@
     <!-- 添加 -->
     <el-dialog title="添加项目" :visible.sync="additionDialogVisible" width="600px">
       <el-form ref="additionForm" :model="additionForm" :rules="additionRules">
-        <el-form-item label="项目名" label-width="100px" prop="name">
+        <el-form-item label="项目" label-width="100px" prop="name">
           <el-input v-model="additionForm.name" style="width: 400px;" />
+        </el-form-item>
+        <el-form-item label="别名" label-width="100px" prop="alias_name">
+          <el-input v-model="additionForm.alias_name" style="width: 400px;" />
         </el-form-item>
         <el-form-item label="语言" label-width="100px" prop="language">
           <el-select v-model="additionForm.language" style="width: 400px;" placeholder="请选择项目语言">
@@ -308,6 +317,7 @@ export default {
       additionDialogVisible: false,
       additionForm: {
         name: '',
+        alias_name: '',
         language: '',
         build_path: '',
         package_name: ''
@@ -340,6 +350,7 @@ export default {
         include_subname: false,
         depend: false,
         authorName: '',
+        alias_name: '', // 项目别名
         message: '', // commit information
         pid: null // 项目ID
       },
@@ -375,7 +386,8 @@ export default {
       },
       // addition规则
       additionRules: {
-        name: [{ required: true, message: '必须输入项目名', trigger: 'blur' }],
+        name: [{ required: true, message: '必须输入项目', trigger: 'blur' }],
+        alias_name: [{ required: true, message: '必须输入别名', trigger: 'blur' }],
         language: [{ required: true, message: '必须选择语言', trigger: 'blur' }]
       }
     }
@@ -480,17 +492,22 @@ export default {
     additionOpen() {
       this.additionForm.name = ''
       this.additionForm.language = ''
+      this.additionForm.alias_name = ''
       this.additionDialogVisible = true
     },
     additionSubmit(formName) {
       this.$refs[formName].validate((valid) => {
         if (valid) {
           if (this.additionForm.language === 'vue' || this.additionForm.language === 'go') {
-            this.additionForm.build_path = 'none'
-            this.additionForm.package_name = 'none'
+            this.additionForm.build_path = ' '
+            this.additionForm.package_name = ' '
+          }
+          if (this.additionForm.alias_name === ' ') {
+            this.additionForm.alias_name = this.additionForm.name
           }
           const data = {
             name: this.additionForm.name,
+            alias_name: this.additionForm.alias_name,
             language: this.additionForm.language,
             build_path: this.additionForm.build_path,
             package_name: this.additionForm.package_name
@@ -549,6 +566,7 @@ export default {
       this.buildForm.image_source = ''
       this.buildForm.authorName = ''
       this.buildForm.message = ''
+      this.buildForm.alias_name = row.alias_name
       this.buildForm.pid = row.project_id
       this.buildDialogVisible = true
     },
@@ -577,6 +595,7 @@ export default {
             build_path: this.buildForm.build_path,
             package_name: this.buildForm.package_name,
             image_source: this.buildForm.image_source,
+            alias_name: this.buildForm.alias_name,
             create_by: window.localStorage.getItem('username')
           }
           postJenkinsJobBuild(data).then(response => {
@@ -606,7 +625,7 @@ export default {
       })
     },
     deployOpen(row) {
-      this.deployForm.name = row.project_name
+      this.deployForm.name = row.alias_name
       this.deployForm.env = ''
       this.deployForm.edition = ''
       this.deployForm.namespace = ''
