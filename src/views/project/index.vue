@@ -3,6 +3,7 @@
     <div>
       <el-button type="primary" icon="el-icon-plus" @click="additionOpen()">添加项目</el-button>
     </div>
+
     <el-table
       v-loading.fullscreen.lock="fullscreenLoading"
       :data="list"
@@ -55,6 +56,7 @@
         </template>
       </el-table-column>
     </el-table>
+
     <div class="line-space">
       <el-pagination layout="total, prev, pager, next" :total="total" hide-on-single-page :current-page.sync="currentPage" :page-size="size" @prev-click="pageChange" @next-click="pageChange" @current-change="pageChange" />
     </div>
@@ -85,6 +87,7 @@
         <el-button size="medium" type="primary" @click="additionSubmit('additionForm')">确 定</el-button>
       </div>
     </el-dialog>
+
     <!-- 编辑 -->
     <el-dialog title="编辑项目" :visible.sync="editDialogVisible" width="600px">
       <el-form :model="editForm">
@@ -118,6 +121,7 @@
         <el-button size="medium" type="primary" @click="editSubmit()">确 定</el-button>
       </div>
     </el-dialog>
+
     <!-- 构建 -->
     <el-dialog title="构建" :visible.sync="buildDialogVisible" width="600px" center>
       <el-form ref="buildForm" :model="buildForm" :rules="buildRules">
@@ -212,6 +216,7 @@
         <el-button size="medium" type="primary" @click="buildSubmit('buildForm')">确 定</el-button>
       </div>
     </el-dialog>
+
     <!-- 发布 -->
     <el-dialog title="发布" :visible.sync="deployDialogVisible" width="600px" center>
       <el-form :model="deployForm">
@@ -266,6 +271,7 @@
         <el-button size="medium" type="primary" @click="deploySubmit()">确 定</el-button>
       </div>
     </el-dialog>
+
   </div>
 </template>
 
@@ -711,6 +717,7 @@ export default {
   .line-space {
     /* margin-right: 10px; */
     border-collapse: separate;
+    margin-bottom: 0;
     /* border-spacing: 10px; */
   }
   .font-color {
