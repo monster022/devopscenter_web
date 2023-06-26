@@ -160,7 +160,7 @@
     </el-dialog>
 
     <!-- terminal -->
-    <el-dialog :visible.sync="openTerminalDialogVisible" width="800px" :title="'Terminal'">
+    <el-dialog :visible.sync="openTerminalDialogVisible" width="970px" :title="'Terminal'">
       <Terminal :hostname="hostName" :ip="instanceIp" :name="instanceUsername" />
     </el-dialog>
 
