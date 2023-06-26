@@ -37,8 +37,10 @@ export default {
     term.open(this.$refs.terminal)
 
     const socket = new WebSocket('ws://127.0.0.1:8080/devops/' + this.ip + '/' + this.name + '/bash/ws?user=' + localStorage.getItem('username') + '&instance=' + this.ip)
+    // Kubernetes部署
+    // const socket = new WebSocket('ws://devopscenter:8080/devops/' + this.ip + '/' + this.name + '/bash/ws?user=' + localStorage.getItem('username') + '&instance=' + this.ip)
     // 远程调试
-    // const socket = new WebSocket('ws://10.11.11.41:8080/devops/ws')
+    // const socket = new WebSocket('ws://10.11.11.41:8080/devops/' + this.ip + '/' + this.name + '/bash/ws?user=' + localStorage.getItem('username') + '&instance=' + this.ip)
     socket.onopen = () => {
       term.write(this.hostname)
     }
