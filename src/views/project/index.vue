@@ -21,6 +21,14 @@
         </template>
       </el-table-column>
       <el-table-column label="项目" header-align="center" align="center">
+        <template slot="header">
+          <div class="custom-header">
+            项目
+            <el-tooltip class="custom-tooltip" effect="dark" content="GitLab 中的名称" placement="top">
+              <i class="el-icon-info" />
+            </el-tooltip>
+          </div>
+        </template>
         <template slot-scope="scope">
           {{ scope.row.project_name }}
           <!-- <el-button :disabled="scope.row.project_status === 0" type="text" size="mini" @click="projectDetail(scope.row.project_name)">{{ scope.row.project_name }}</el-button> -->
@@ -28,6 +36,14 @@
         </template>
       </el-table-column>
       <el-table-column label="名称" header-align="center" align="center">
+        <template slot="header">
+          <div class="custom-header">
+            名称
+            <el-tooltip class="custom-tooltip" effect="dark" content="K8s 中 DeployMent 的名称" placement="top">
+              <i class="el-icon-info" />
+            </el-tooltip>
+          </div>
+        </template>
         <template slot-scope="scope">
           <el-button :disabled="scope.row.project_status === 0" type="text" size="mini" @click="projectDetail(scope.row.alias_name)">{{ scope.row.alias_name }}</el-button>
         </template>
@@ -396,6 +412,27 @@ export default {
     this.fetchData()
   },
   methods: {
+    // renderHeader(h, { column, $index }) {
+    //   const index = $index
+    //   let msg = 'default'
+    //   if (index === 1) {
+    //     msg = 'GitLab中的名称'
+    //   } else if (index === 2) {
+    //     msg = 'K8s中DeployMent的名称'
+    //   }
+    //   return h('div', [
+    //     h('span', column.label),
+    //     h('i', {
+    //       class: 'el-icon-info',
+    //       style: {
+    //         marginLeft: '5px'
+    //       },
+    //       attrs: {
+    //         title: msg
+    //       }
+    //     })
+    //   ])
+    // },
     buildType(id, status) {
       let bk = false
       if (this.bId || status === 0) {
