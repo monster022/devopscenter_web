@@ -20,7 +20,7 @@
           {{ scope.row.id }}
         </template>
       </el-table-column>
-      <el-table-column label="项目" header-align="center" align="center">
+      <el-table-column label="项目" header-align="center" align="center" show-overflow-tooltip>
         <template slot="header">
           <div class="custom-header">
             项目
