@@ -672,7 +672,8 @@ export default {
         project: row.project_name
       }
       getHarborTag(params).then(response => {
-        this.tagList = response.data
+        const harborList = response.data
+        this.tagList = harborList.slice().reverse()
       })
       this.deployDialogVisible = true
     },
@@ -726,7 +727,8 @@ export default {
         env: this.deployForm.env
       }
       getHarborTag(params).then(response => {
-        this.tagList = response.data
+        const harborList = response.data
+        this.tagList = harborList.slice().reverse()
       })
       getNameSpaceList(params2).then(response => {
         this.namespaceList = response.data
