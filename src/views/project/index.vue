@@ -684,7 +684,8 @@ export default {
           deployment_name: this.deployForm.name,
           namespace: this.deployForm.namespace,
           container_name: this.deployForm.container_name,
-          image_source: 'harbor.chengdd.cn/' + this.deployForm.env + '/' + this.deployForm.name + ':' + this.deployForm.edition
+          image_source: 'harbor.chengdd.cn/' + this.deployForm.env + '/' + this.deployForm.name + ':' + this.deployForm.edition,
+          create_by: localStorage.getItem('username')
         }
         patchDeploymentImage(data).then(response => {
           this.$message({

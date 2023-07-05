@@ -91,7 +91,15 @@ export function patchEdit(name, data) {
 // 项目构建信息
 export function getProjectDetails(project, params) {
   return request({
-    url: '/project/detail/' + project,
+    url: '/project/build/detail/' + project,
+    method: 'get',
+    params
+  })
+}
+
+export function getProjectDeployDetails(project, params) {
+  return request({
+    url: '/project/deploy/detail/' + project,
     method: 'get',
     params
   })
