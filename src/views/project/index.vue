@@ -193,12 +193,11 @@
               <el-switch v-model="buildForm.depend" />
             </el-form-item>
           </el-col>
-          <el-col :span="12">
+          <!-- <el-col :span="12">
             <el-form-item v-if="buildForm.language === 'dotnet5.0' || buildForm.language === 'dotnet2.2'" label="是否包含子项目" label-width="180px">
-              <!--el-input v-model="buildForm.sub_name" style="width: 150px;" placeholder="一个项目包含多个子项目时填写" /-->
               <el-switch v-model="buildForm.include_subname" />
             </el-form-item>
-          </el-col>
+          </el-col> -->
         </el-row>
         <el-row>
           <el-col :span="12">
@@ -218,9 +217,9 @@
         <el-form-item v-if="buildForm.depend === true" label="依赖仓库" label-width="80px">
           <el-input v-model="buildForm.dependent_repository" style="width: 425px;" :disabled="true" />
         </el-form-item>
-        <el-form-item v-if="buildForm.include_subname === true" label="子名称" label-width="80px">
+        <!-- <el-form-item v-if="buildForm.include_subname === true" label="子名称" label-width="80px">
           <el-input v-model="buildForm.sub_name" style="width: 425px;" placeholder="一个项目包含多个子项目时填写" />
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item v-if="buildForm.language === 'dotnet5.0' || buildForm.language === 'dotnet2.2'" label="构建路径" label-width="80px" prop="build_path">
           <el-input v-model="buildForm.build_path" style="width: 425px;" placeholder=".cspro文件所在路径" />
         </el-form-item>
@@ -357,14 +356,14 @@ export default {
         repository: '',
         dependent_repository: 'git@gitlab.mojorycorp.cn:mojory/commonlibs.git',
         dependent_project: 'commonlibs',
-        sub_name: '',
+        // sub_name: '',
         branch: '',
         short_id: '',
         dependent_branch: 'release_20220418',
         build_path: '',
         package_name: '',
         image_source: '',
-        include_subname: false,
+        // include_subname: false,
         depend: false,
         authorName: '',
         alias_name: '', // 项目别名
@@ -600,7 +599,7 @@ export default {
       this.buildForm.package_name = row.package_name
       this.buildForm.env = ''
       this.buildForm.branch = ''
-      this.buildForm.sub_name = ''
+      // this.buildForm.sub_name = ''
       this.buildForm.image_source = ''
       this.buildForm.authorName = ''
       this.buildForm.message = ''
@@ -628,7 +627,7 @@ export default {
             dependent_repository: this.buildForm.dependent_repository,
             project: this.buildForm.name,
             dependent_project: this.buildForm.dependent_project,
-            sub_name: this.buildForm.sub_name,
+            // sub_name: this.buildForm.sub_name,
             branch: this.buildForm.branch,
             short_id: this.buildForm.short_id,
             dependent_branch: this.buildForm.dependent_branch,
