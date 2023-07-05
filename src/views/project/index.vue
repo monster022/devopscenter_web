@@ -359,6 +359,7 @@ export default {
         dependent_project: 'commonlibs',
         sub_name: '',
         branch: '',
+        short_id: '',
         dependent_branch: 'release_20220418',
         build_path: '',
         package_name: '',
@@ -614,6 +615,7 @@ export default {
       getProjectCommitMessage(this.buildForm.pid, params).then(response => {
         this.buildForm.authorName = response.data.authorName
         this.buildForm.message = response.data.message
+        this.buildForm.short_id = response.data.short_id
       })
     },
     buildSubmit(formName) {
@@ -628,6 +630,7 @@ export default {
             dependent_project: this.buildForm.dependent_project,
             sub_name: this.buildForm.sub_name,
             branch: this.buildForm.branch,
+            short_id: this.buildForm.short_id,
             dependent_branch: this.buildForm.dependent_branch,
             build_path: this.buildForm.build_path,
             package_name: this.buildForm.package_name,
@@ -635,6 +638,7 @@ export default {
             alias_name: this.buildForm.alias_name,
             create_by: window.localStorage.getItem('username')
           }
+          console.log(this.buildForm.short_id)
           postJenkinsJobBuild(data).then(response => {
             this.bId = this.buildForm.id
             this.$message({
@@ -642,8 +646,6 @@ export default {
               message: response.message
             })
             this.jobId = response.data
-            console.log(response.data)
-            console.log(this.jobId)
           }).catch(err => {
             console.log(err)
           })

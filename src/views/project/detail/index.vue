@@ -1,5 +1,6 @@
 <template>
   <div>
+    <!-- 构建详情 -->
     <div class="app-container">
       <el-table
         v-loading.fullscreen.lock="fullscreenLoading"
@@ -51,6 +52,7 @@
         </el-table-column>
       </el-table>
     </div>
+    <!-- 发布详情 -->
     <div class="app-container">
       <el-table
         v-loading.fullscreen.lock="fullscreenLoading"
@@ -83,7 +85,12 @@
             {{ scope.row.namespace }}
           </template>
         </el-table-column>
-        <el-table-column label="版本" header-align="center" align="center" show-overflow-tooltip>
+        <el-table-column label="项目版本" header-align="center" align="center">
+          <template slot-scope="scope">
+            {{ scope.row.commit_id }}
+          </template>
+        </el-table-column>
+        <el-table-column label="镜像版本" header-align="center" align="center" show-overflow-tooltip>
           <template slot-scope="scope">
             {{ scope.row.version }}
           </template>
