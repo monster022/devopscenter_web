@@ -67,7 +67,7 @@ export const constantRoutes = [
       {
         path: 'detail/:project',
         meta: { title: '构建详情页' },
-        component: () => import('@/views/detail/build/index'),
+        component: () => import('@/views/project/detail/index'),
         hidden: true
       }
     ]
