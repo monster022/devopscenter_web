@@ -244,6 +244,12 @@
     <!-- 发布 -->
     <el-dialog title="发布" :visible.sync="deployDialogVisible" width="600px" center>
       <el-form :model="deployForm">
+        <el-form-item label="发布方式" label-width="80px">
+          <el-radio-group v-model="deployForm.publish_type">
+            <el-radio :label="1"> Kubernetes </el-radio>
+            <el-radio :label="2"> Docker </el-radio>
+          </el-radio-group>
+        </el-form-item>
         <el-row>
           <el-col :span="12">
             <el-form-item label="名称" label-width="80px">
@@ -263,21 +269,21 @@
         </el-row>
         <el-row>
           <el-col :span="12">
-            <el-form-item label="名称空间" label-width="80px">
+            <el-form-item v-if="deployForm.publish_type === 1" label="名称空间" label-width="80px">
               <el-select v-model="deployForm.namespace" style="width: 150px;" placeholder="默认与环境名相同" @change="namespaceSelect()">
                 <el-option v-for="(item, index) in namespaceList" :key="index" :label="item.metadata.name" :value="item.metadata.name" />
               </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="容器名" label-width="80px">
+            <el-form-item v-if="deployForm.publish_type === 1" label="容器名" label-width="80px">
               <el-select v-model="deployForm.container_name" style="width: 150px;" placeholder="请输入容器名">
                 <el-option v-for="(item, index) in containirNameList" :key="index" :label="item.name" :value="item.name" />
               </el-select>
             </el-form-item>
           </el-col>
         </el-row>
-        <el-form-item label="调试" label-width="80px">
+        <el-form-item v-if="deployForm.publish_type === 1" label="调试" label-width="80px">
           <el-switch v-model="deployForm.urgen" />
         </el-form-item>
         <el-form-item v-if="deployForm.urgen === false" label="版本" label-width="80px">
@@ -287,6 +293,16 @@
         </el-form-item>
         <el-form-item v-if="deployForm.urgen === true" label="版本" label-width="80px">
           <el-input v-model="deployForm.urgenEdition" style="width: 425px;" placeholder="请输入完成镜像地址" />
+        </el-form-item>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item v-if="deployForm.publish_type === 2" label="访问端口" label-width="80px">
+              <el-input />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-form-item v-if="deployForm.publish_type === 2">
+          <el-transfer v-model="transferValue" :data="transferData" :titles="['Source', 'Target']" />
         </el-form-item>
 
       </el-form>
@@ -307,6 +323,17 @@ import { getSpecifyDeployMent, patchDeploymentImage } from '@/api/deployment'
 
 export default {
   data() {
+    const generateData = _ => {
+      const data = []
+      for (let i = 1; i <= 2; i++) {
+        data.push({
+          key: i,
+          label: `172.16.1.20${i}`
+          // disabled: i % 4 === 0
+        })
+      }
+      return data
+    }
     return {
       bId: '',				// 选定的id
       list: null,
@@ -373,6 +400,7 @@ export default {
       // 发布状态与数据
       deployDialogVisible: false,
       deployForm: {
+        publish_type: 1,
         name: '',
         env: '',
         edition: '',
@@ -405,7 +433,10 @@ export default {
         name: [{ required: true, message: '必须输入项目', trigger: 'blur' }],
         alias_name: [{ required: true, message: '必须输入别名', trigger: 'blur' }],
         language: [{ required: true, message: '必须选择语言', trigger: 'blur' }]
-      }
+      },
+      // 穿梭框
+      transferData: generateData(),
+      transferValue: []
     }
   },
   created() {
@@ -668,6 +699,8 @@ export default {
       this.deployForm.edition = ''
       this.deployForm.namespace = ''
       this.deployForm.container_name = ''
+      this.deployForm.publish_type = 1
+      console.log(this.deployForm.publish_type)
       const params = {
         env: this.deployForm.env,
         project: row.project_name
@@ -784,4 +817,21 @@ export default {
     background: #2e90ff;
   }
   .el-button.is-disabled.act { color: #409EFF; }
+  /* 穿梭框 */
+  .el-transfer {
+    font-size: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .el-transfer__buttons {
+    display: inline-block;
+    vertical-align: middle;
+    padding: 0 10px;
+  }
+  .el-transfer-panel {
+    width: 180px;
+    height: 180px;
+  }
+
 </style>
