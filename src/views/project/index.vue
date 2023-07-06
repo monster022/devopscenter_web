@@ -699,6 +699,7 @@ export default {
       this.deployForm.edition = ''
       this.deployForm.namespace = ''
       this.deployForm.container_name = ''
+      this.deployForm.publish_type = 1
       console.log(this.deployForm.publish_type)
       const params = {
         env: this.deployForm.env,
