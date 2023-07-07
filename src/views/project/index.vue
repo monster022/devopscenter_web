@@ -302,7 +302,7 @@
           </el-col>
         </el-row>
         <el-form-item v-if="deployForm.publish_type === 2">
-          <el-transfer v-model="transferValue" :data="transferData" :titles="['Source', 'Target']" />
+          <el-transfer v-model="deployForm.transferValue" :data="transferData" :titles="['Source', 'Target']" />
         </el-form-item>
 
       </el-form>
@@ -407,7 +407,9 @@ export default {
         urgen: false,
         urgenEdition: '',
         namespace: '',
-        container_name: ''
+        container_name: '',
+        container_port: '',
+        transferValue: []
       },
       // harbor 版本数组
       tagList: [],
@@ -435,8 +437,7 @@ export default {
         language: [{ required: true, message: '必须选择语言', trigger: 'blur' }]
       },
       // 穿梭框
-      transferData: generateData(),
-      transferValue: []
+      transferData: generateData()
     }
   },
   created() {
@@ -700,7 +701,6 @@ export default {
       this.deployForm.namespace = ''
       this.deployForm.container_name = ''
       this.deployForm.publish_type = 1
-      console.log(this.deployForm.publish_type)
       const params = {
         env: this.deployForm.env,
         project: row.project_name
@@ -712,41 +712,54 @@ export default {
       this.deployDialogVisible = true
     },
     deploySubmit() {
-      if (this.deployForm.urgen === false) {
-        const data = {
-          env: this.deployForm.env,
-          deployment_name: this.deployForm.name,
-          namespace: this.deployForm.namespace,
-          container_name: this.deployForm.container_name,
-          image_source: 'harbor.chengdd.cn/' + this.deployForm.env + '/' + this.deployForm.name + ':' + this.deployForm.edition,
-          create_by: localStorage.getItem('username')
-        }
-        patchDeploymentImage(data).then(response => {
-          this.$message({
-            type: 'success',
-            message: response.message
+      if (this.deployForm.publish_type === 1) {
+        // Docker 发布
+        if (this.deployForm.urgen === false) {
+          const data = {
+            env: this.deployForm.env,
+            deployment_name: this.deployForm.name,
+            namespace: this.deployForm.namespace,
+            container_name: this.deployForm.container_name,
+            image_source: 'harbor.chengdd.cn/' + this.deployForm.env + '/' + this.deployForm.name + ':' + this.deployForm.edition,
+            create_by: localStorage.getItem('username')
+          }
+          patchDeploymentImage(data).then(response => {
+            this.$message({
+              type: 'success',
+              message: response.message
+            })
+          }).catch(error => {
+            console.log(error)
           })
-        }).catch(error => {
-          console.log(error)
-        })
-        this.deployDialogVisible = false
+          this.deployDialogVisible = false
+        } else {
+          const data = {
+            env: this.deployForm.env,
+            deployment_name: this.deployForm.name,
+            namespace: this.deployForm.namespace,
+            container_name: this.deployForm.container_name,
+            image_source: this.deployForm.urgenEdition
+          }
+          patchDeploymentImage(data).then(response => {
+            this.$message({
+              type: 'success',
+              message: response.message
+            })
+          }).catch(error => {
+            console.log(error)
+          })
+          this.deployDialogVisible = false
+        }
       } else {
         const data = {
           env: this.deployForm.env,
           deployment_name: this.deployForm.name,
-          namespace: this.deployForm.namespace,
-          container_name: this.deployForm.container_name,
-          image_source: this.deployForm.urgenEdition
+          image_source: 'harbor.chengdd.cn/' + this.deployForm.env + '/' + this.deployForm.name + ':' + this.deployForm.edition,
+          target: this.deployForm.transferValue,
+          port: this.deployForm.container_port,
+          create_by: localStorage.getItem('username')
         }
-        patchDeploymentImage(data).then(response => {
-          this.$message({
-            type: 'success',
-            message: response.message
-          })
-        }).catch(error => {
-          console.log(error)
-        })
-        this.deployDialogVisible = false
+        console.log(data)
       }
     },
     tagSelect() {
