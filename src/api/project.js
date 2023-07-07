@@ -121,3 +121,11 @@ export function getProjectCommitMessage(pid, params) {
     params
   })
 }
+
+export function postDockerProjectDeploy(data) {
+  return request({
+    url: '/container',
+    method: 'post',
+    data
+  })
+}
