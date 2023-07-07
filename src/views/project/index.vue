@@ -762,7 +762,6 @@ export default {
         }
       }
     },
-
     getNewArr(arr){
     	let newArr = [];
     	let tdArr = JSON.parse(JSON.stringify(this.transferData));
@@ -775,8 +774,6 @@ export default {
 		});
 		return newArr;
     },
-
-
     doSort(data){
     	console.log(data);
     	let z = JSON.parse(JSON.stringify(data));
@@ -784,10 +781,6 @@ export default {
     	console.log(z);
 		return z;
     },
-
-
-
-
     tagSelect() {
       // console.log(this.deployForm.name)
       this.deployForm.namespace = ''
