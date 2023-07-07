@@ -707,6 +707,7 @@ export default {
       }
       getHarborTag(params).then(response => {
         const harborList = response.data
+        console.log(harborList);
         this.tagList = harborList.slice().reverse()
       })
       this.deployDialogVisible = true
@@ -755,13 +756,38 @@ export default {
           env: this.deployForm.env,
           deployment_name: this.deployForm.name,
           image_source: 'harbor.chengdd.cn/' + this.deployForm.env + '/' + this.deployForm.name + ':' + this.deployForm.edition,
-          target: this.deployForm.transferValue,
+          target: this.getNewArr(this.deployForm.transferValue),
           port: this.deployForm.container_port,
           create_by: localStorage.getItem('username')
         }
-        console.log(data)
       }
     },
+
+    getNewArr(arr){
+    	let newArr = [];
+    	let tdArr = JSON.parse(JSON.stringify(this.transferData));
+		arr.forEach((item, index) =>{
+			tdArr.forEach((item01, index01) =>{
+				if(item == item01.key){
+					newArr.push(item01.label);
+				}
+			});
+		});
+		return newArr;
+    },
+
+
+    doSort(data){
+    	console.log(data);
+    	let z = JSON.parse(JSON.stringify(data));
+		z.sort(function(a, b){return b.created.localeCompare(a.created)});
+    	console.log(z);
+		return z;
+    },
+
+
+
+
     tagSelect() {
       // console.log(this.deployForm.name)
       this.deployForm.namespace = ''
@@ -776,7 +802,8 @@ export default {
       }
       getHarborTag(params).then(response => {
         const harborList = response.data
-        this.tagList = harborList.slice().reverse()
+        console.log(harborList);
+        this.tagList = this.doSort(harborList);
       })
       getNameSpaceList(params2).then(response => {
         this.namespaceList = response.data
