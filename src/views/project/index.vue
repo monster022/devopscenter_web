@@ -297,12 +297,12 @@
         <el-row>
           <el-col :span="12">
             <el-form-item v-if="deployForm.publish_type === 2" label="访问端口" label-width="80px">
-              <el-input />
+              <el-input v-model="deployForm.container_port" style="width: 425px;" placeholder="请输入Docker访问的地址" />
             </el-form-item>
           </el-col>
         </el-row>
         <el-form-item v-if="deployForm.publish_type === 2">
-          <el-transfer v-model="transferValue" :data="transferData" :titles="['Source', 'Target']" />
+          <el-transfer v-model="deployForm.transferValue" :data="transferData" :titles="['Source', 'Target']" />
         </el-form-item>
 
       </el-form>
@@ -317,7 +317,9 @@
 
 <script>
 import { getNameSpaceList } from '@/api/namespace'
-import { getList, getBranch, getHarborTag, postJenkinsJobBuild, deleteList, postAddition, patchStatus, patchEdit, getJenkinsBuildStatus, getProjectCommitMessage } from '@/api/project'
+import { getList, getBranch, getHarborTag, postJenkinsJobBuild, deleteList, postAddition,
+  patchStatus, patchEdit, getJenkinsBuildStatus, getProjectCommitMessage,
+  postDockerProjectDeploy } from '@/api/project'
 import { getSpecifyDeployMent, patchDeploymentImage } from '@/api/deployment'
 // import axios from 'axios'
 
@@ -325,13 +327,20 @@ export default {
   data() {
     const generateData = _ => {
       const data = []
-      for (let i = 1; i <= 2; i++) {
-        data.push({
-          key: i,
-          label: `172.16.1.20${i}`
-          // disabled: i % 4 === 0
-        })
-      }
+      data.push({
+        key: 1,
+        label: `10.11.11.134`
+      }, {
+        key: 2,
+        label: `10.11.11.124`
+      })
+      // for (let i = 1; i <= 2; i++) {
+      //   data.push({
+      //     key: i,
+      //     label: `172.16.1.20${i}`
+      //     // disabled: i % 4 === 0
+      //   })
+      // }
       return data
     }
     return {
@@ -407,7 +416,9 @@ export default {
         urgen: false,
         urgenEdition: '',
         namespace: '',
-        container_name: ''
+        container_name: '',
+        container_port: '',
+        transferValue: []
       },
       // harbor 版本数组
       tagList: [],
@@ -435,8 +446,7 @@ export default {
         language: [{ required: true, message: '必须选择语言', trigger: 'blur' }]
       },
       // 穿梭框
-      transferData: generateData(),
-      transferValue: []
+      transferData: generateData()
     }
   },
   created() {
@@ -700,51 +710,73 @@ export default {
       this.deployForm.namespace = ''
       this.deployForm.container_name = ''
       this.deployForm.publish_type = 1
-      console.log(this.deployForm.publish_type)
       const params = {
         env: this.deployForm.env,
         project: row.project_name
       }
       getHarborTag(params).then(response => {
-        const harborList = response.data
-        this.tagList = harborList.slice().reverse()
+        // const harborList = response.data
+        // this.tagList = harborList.slice().reverse()
+        this.tagList = this.doSort(response.data)
       })
       this.deployDialogVisible = true
     },
     deploySubmit() {
-      if (this.deployForm.urgen === false) {
+      if (this.deployForm.publish_type === 1) {
+        // Kubernetes 发布
+        if (this.deployForm.urgen === false) {
+          const data = {
+            env: this.deployForm.env,
+            deployment_name: this.deployForm.name,
+            namespace: this.deployForm.namespace,
+            container_name: this.deployForm.container_name,
+            image_source: 'harbor.chengdd.cn/' + this.deployForm.env + '/' + this.deployForm.name + ':' + this.deployForm.edition,
+            create_by: localStorage.getItem('username')
+          }
+          patchDeploymentImage(data).then(response => {
+            this.$message({
+              type: 'success',
+              message: response.message
+            })
+          }).catch(error => {
+            console.log(error)
+          })
+          this.deployDialogVisible = false
+        } else {
+          const data = {
+            env: this.deployForm.env,
+            deployment_name: this.deployForm.name,
+            namespace: this.deployForm.namespace,
+            container_name: this.deployForm.container_name,
+            image_source: this.deployForm.urgenEdition
+          }
+          patchDeploymentImage(data).then(response => {
+            this.$message({
+              type: 'success',
+              message: response.message
+            })
+          }).catch(error => {
+            console.log(error)
+          })
+          this.deployDialogVisible = false
+        }
+      } else {
+        // Docker 发布
         const data = {
           env: this.deployForm.env,
-          deployment_name: this.deployForm.name,
-          namespace: this.deployForm.namespace,
-          container_name: this.deployForm.container_name,
-          image_source: 'harbor.chengdd.cn/' + this.deployForm.env + '/' + this.deployForm.name + ':' + this.deployForm.edition,
+          name: this.deployForm.name,
+          image: 'harbor.chengdd.cn/' + this.deployForm.env + '/' + this.deployForm.name + ':' + this.deployForm.edition,
+          target: this.transferValue(this.deployForm.transferValue),
+          port: this.deployForm.container_port,
           create_by: localStorage.getItem('username')
         }
-        patchDeploymentImage(data).then(response => {
+        postDockerProjectDeploy(data).then(response => {
           this.$message({
             type: 'success',
             message: response.message
+          }).catch(error => {
+            console.log(error)
           })
-        }).catch(error => {
-          console.log(error)
-        })
-        this.deployDialogVisible = false
-      } else {
-        const data = {
-          env: this.deployForm.env,
-          deployment_name: this.deployForm.name,
-          namespace: this.deployForm.namespace,
-          container_name: this.deployForm.container_name,
-          image_source: this.deployForm.urgenEdition
-        }
-        patchDeploymentImage(data).then(response => {
-          this.$message({
-            type: 'success',
-            message: response.message
-          })
-        }).catch(error => {
-          console.log(error)
         })
         this.deployDialogVisible = false
       }
@@ -762,8 +794,8 @@ export default {
         env: this.deployForm.env
       }
       getHarborTag(params).then(response => {
-        const harborList = response.data
-        this.tagList = harborList.slice().reverse()
+        // const harborList = response.data
+        this.tagList = this.doSort(response.data)
       })
       getNameSpaceList(params2).then(response => {
         this.namespaceList = response.data
@@ -801,6 +833,28 @@ export default {
       }).catch(error => {
         console.error(error)
       })
+    },
+    // 从穿梭框中拿取数据
+    transferValue(arr) {
+      const newArr = []
+      const tdArr = JSON.parse(JSON.stringify(this.transferData))
+      arr.forEach((item, index) => {
+        tdArr.forEach((item01, index01) => {
+          if (item === item01.key) {
+            newArr.push(item01.label)
+          }
+        })
+      })
+      return newArr
+    },
+    // 排序harbor标签
+    doSort(data) {
+      if (!Array.isArray(data)) {
+        return []
+      }
+      const z = data.slice() // 创建data的浅拷贝
+      z.sort(function(a, b) { return b.created.localeCompare(a.created) })
+      return z
     }
   }
 }
