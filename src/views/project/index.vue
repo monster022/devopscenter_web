@@ -320,29 +320,15 @@ import { getNameSpaceList } from '@/api/namespace'
 import { getList, getBranch, getHarborTag, postJenkinsJobBuild, deleteList, postAddition,
   patchStatus, patchEdit, getJenkinsBuildStatus, getProjectCommitMessage,
   postDockerProjectDeploy } from '@/api/project'
+import { getPublishMachineList } from '@/api/machine'
 import { getSpecifyDeployMent, patchDeploymentImage } from '@/api/deployment'
 // import axios from 'axios'
 
 export default {
   data() {
-    const generateData = _ => {
-      const data = []
-      data.push({
-        key: 1,
-        label: `10.11.11.134`
-      }, {
-        key: 2,
-        label: `10.11.11.124`
-      })
-      // for (let i = 1; i <= 2; i++) {
-      //   data.push({
-      //     key: i,
-      //     label: `172.16.1.20${i}`
-      //     // disabled: i % 4 === 0
-      //   })
-      // }
-      return data
-    }
+    // const generateData = _ => {
+
+    // }
     return {
       bId: '',				// 选定的id
       list: null,
@@ -446,13 +432,24 @@ export default {
         language: [{ required: true, message: '必须选择语言', trigger: 'blur' }]
       },
       // 穿梭框
-      transferData: generateData()
+      transferData: []
     }
   },
   created() {
     this.fetchData()
   },
   methods: {
+    // 穿梭框数据的获取
+    generateData(arr) {
+      const data = []
+      for (let i = 1; i <= arr.length; i++) {
+        data.push({
+          key: i,
+          label: arr[i - 1]
+        })
+      }
+      return data
+    },
     // renderHeader(h, { column, $index }) {
     //   const index = $index
     //   let msg = 'default'
@@ -710,6 +707,8 @@ export default {
       this.deployForm.namespace = ''
       this.deployForm.container_name = ''
       this.deployForm.publish_type = 1
+      this.deployForm.container_port = ''
+      this.deployForm.transferValue = ''
       const params = {
         env: this.deployForm.env,
         project: row.project_name
@@ -718,6 +717,9 @@ export default {
         // const harborList = response.data
         // this.tagList = harborList.slice().reverse()
         this.tagList = this.doSort(response.data)
+      })
+      getPublishMachineList(row.id).then(response => {
+        this.transferData = this.generateData(response.data)
       })
       this.deployDialogVisible = true
     },
