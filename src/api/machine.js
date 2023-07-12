@@ -40,3 +40,10 @@ export function patchMachineName(id, params) {
     params
   })
 }
+
+export function getPublishMachineList(id) {
+  return request({
+    url: '/container/machine/' + id,
+    method: 'get'
+  })
+}
