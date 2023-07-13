@@ -708,7 +708,7 @@ export default {
       this.deployForm.container_name = ''
       this.deployForm.publish_type = 1
       this.deployForm.container_port = ''
-      this.deployForm.transferValue = ''
+      // this.deployForm.transferValue = ''
       const params = {
         env: this.deployForm.env,
         project: row.project_name
