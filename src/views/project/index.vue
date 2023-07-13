@@ -12,7 +12,7 @@
       element-loading-background="rgba(0, 0, 0, 0.7)"
       fit
       stripe
-      max-height="815"
+      max-height="790"
       highlight-current-row
     >
       <el-table-column label="序号" width="95" header-align="center" align="center">
@@ -79,7 +79,7 @@
       </el-table-column>
     </el-table>
 
-    <div class="line-space">
+    <div class="paginationClass">
       <el-pagination layout="total, prev, pager, next" :total="total" hide-on-single-page :current-page.sync="currentPage" :page-size="size" @prev-click="pageChange" @next-click="pageChange" @current-change="pageChange" />
     </div>
 
@@ -863,11 +863,12 @@ export default {
 </script>
 
 <style>
-  .line-space {
-    /* margin-right: 10px; */
-    border-collapse: separate;
-    margin-bottom: 0;
-    /* border-spacing: 10px; */
+  .paginationClass {
+    position: fixed;
+    bottom: 0;
+    padding: 5px;
+    height: 40px;
+    width: 100%;
   }
   .font-color {
     background: #2e90ff;

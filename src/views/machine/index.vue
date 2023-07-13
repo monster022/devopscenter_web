@@ -2,7 +2,10 @@
   <div class="app-container">
     <!-- 表头 -->
     <div>
-      <el-button type="primary" icon="el-icon-plus" @click="additionOpen()">添加实例</el-button>
+      <el-button style="float: left;" type="primary" icon="el-icon-plus" @click="additionOpen()">添加实例</el-button>
+      <el-input v-model="headInput" style="float: left; width: 200px; margin-left: 30px;" placeholder="请输入IP模糊搜索" @change="fetchData()">
+        <i slot="prefix" class="el-input__icon el-icon-search" />
+      </el-input>
     </div>
 
     <!-- 表格 -->
@@ -14,7 +17,7 @@
       element-loading-background="rgba(0, 0, 0, 0.7)"
       fit
       stripe
-      max-height="815"
+      max-height="790"
       highlight-current-row
     >
       <el-table-column label="序号" width="95" header-align="center" align="center">
@@ -22,7 +25,7 @@
           {{ scope.row.id }}
         </template>
       </el-table-column>
-      <el-table-column label="名称" header-align="center" align="center">
+      <el-table-column label="名称" header-align="center" align="center" show-overflow-tooltip>
         <template slot-scope="scope">
           {{ scope.row.instance_name }}
         </template>
@@ -68,7 +71,9 @@
     </el-table>
 
     <!-- 分页 -->
-    <el-pagination layout="total, prev, pager, next" :total="total" hide-on-single-page :current-page.sync="currentPage" :page-size="size" @prev-click="pageChange" @next-click="pageChange" @current-change="pageChange" />
+    <div class="paginationClass">
+      <el-pagination layout="total, prev, pager, next" :total="total" hide-on-single-page :current-page.sync="currentPage" :page-size="size" @prev-click="pageChange" @next-click="pageChange" @current-change="pageChange" />
+    </div>
 
     <!-- 添加 子表单 -->
     <el-dialog :visible.sync="additionDialogVisible" width="600px" :title="'添加实例'">
@@ -187,6 +192,8 @@ export default {
   },
   data() {
     return {
+      // 表头
+      headInput: null,
       list: null,
       fullscreenLoading: false,
       // 分页设置
@@ -236,8 +243,9 @@ export default {
     fetchData() {
       this.fullscreenLoading = true
       const params = {
-        page: 1,
-        size: this.size
+        page: this.currentPage,
+        size: this.size,
+        ip: this.headInput
       }
       getList(params).then(response => {
         this.list = response.data
@@ -292,7 +300,8 @@ export default {
       this.fullscreenLoading = true
       const params = {
         page: val,
-        size: this.size
+        size: this.size,
+        ip: this.headInput
       }
       getList(params).then(response => {
         this.list = response.data
@@ -378,4 +387,14 @@ export default {
 </script>
 
 <style>
+  /* .buttonHead {
+    float: left;
+  } */
+  .paginationClass {
+    position: fixed;
+    bottom: 0;
+    padding: 5px;
+    height: 40px;
+    width: 100%;
+  }
 </style>
