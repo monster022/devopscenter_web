@@ -1,23 +1,11 @@
 <template>
   <div>
-    <div>
-      <el-row>
-        <el-col :span="1" class="topAndLeft-interval">
-          <el-button size="small" @click="allOrder()"> 所有待办 </el-button>
-        </el-col>
-        <el-col :span="1" class="topAndLeft-interval">
-          <el-button size="small" @click="tackleOrder()"> 我的待办 </el-button>
-        </el-col>
-        <el-col :span="1" class="topAndLeft-interval">
-          <el-button size="small" @click="submitOrder()"> 我创建的 </el-button>
-        </el-col>
-        <el-col :span="1" class="topAndLeft-interval">
-          <el-button size="small"> 我相关的 </el-button>
-        </el-col>
-        <el-col :span="1" class="topAndLeft-interval">
-          <el-button type="primary" size="small" icon="el-icon-s-promotion" @click="submitOpen()"> 提交申请 </el-button>
-        </el-col>
-      </el-row>
+    <div style="float: left; margin-top: 20px; margin-left: 20px; margin-bottom: 10px;">
+      <el-button size="small" @click="allOrder()"> 所有待办 </el-button>
+      <el-button size="small" @click="tackleOrder()"> 我的待办 </el-button>
+      <el-button size="small" @click="submitOrder()"> 我创建的 </el-button>
+      <el-button size="small"> 我相关的 </el-button>
+      <el-button type="primary" size="small" icon="el-icon-s-promotion" @click="submitOpen()"> 提交申请 </el-button>
     </div>
 
     <div class="app-container">
@@ -166,6 +154,8 @@ export default {
   },
   data() {
     return {
+      // 默认框
+      defaultRadio: '所有待办',
       tableData: null,
       currentTackleName: localStorage.getItem('username'),
       additionFrom: {
@@ -306,6 +296,9 @@ export default {
 </script>
 
 <style>
+  .el-radio-button {
+    margin-right: 30px; /* 调整适当的间距 */
+  }
   .topAndLeft-interval {
     margin-top: 20px;
     margin-left: 20px;
