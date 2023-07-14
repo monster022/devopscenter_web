@@ -148,7 +148,7 @@
     </el-dialog>
 
     <!-- 构建 -->
-    <el-dialog title="构建" :visible.sync="buildDialogVisible" width="600px" center>
+    <el-dialog :title="build_title" :visible.sync="buildDialogVisible" width="600px" center>
       <el-form ref="buildForm" :model="buildForm" :rules="buildRules">
         <el-row>
           <el-col :span="12">
@@ -242,7 +242,7 @@
     </el-dialog>
 
     <!-- 发布 -->
-    <el-dialog title="发布" :visible.sync="deployDialogVisible" width="600px" center>
+    <el-dialog :title="deploy_title" :visible.sync="deployDialogVisible" width="600px" center>
       <el-form :model="deployForm">
         <el-form-item label="发布方式" label-width="80px">
           <el-radio-group v-model="deployForm.publish_type">
@@ -330,6 +330,9 @@ export default {
 
     // }
     return {
+      // title
+      deploy_title: '',
+      build_title: '',
       bId: '',				// 选定的id
       list: null,
       fullscreenLoading: false,
@@ -623,6 +626,7 @@ export default {
       this.fetchData()
     },
     buildOpen(row) {
+      this.build_title = row.language + ' ' + row.alias_name + ' 项目构建'
       const params = {
         id: row.project_id
       }
@@ -701,6 +705,7 @@ export default {
       })
     },
     deployOpen(row) {
+      this.deploy_title = row.alias_name + ' 项目发布'
       this.deployForm.name = row.alias_name
       this.deployForm.env = ''
       this.deployForm.edition = ''
