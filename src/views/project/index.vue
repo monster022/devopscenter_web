@@ -860,7 +860,8 @@ export default {
         return []
       }
       const z = data.slice() // 创建data的浅拷贝
-      z.sort(function(a, b) { return b.created.localeCompare(a.created) })
+      // z.sort(function(a, b) { return b.push_time.localeCompare(a.push_time) })
+      z.sort(function(a, b) { return b.push_time.localeCompare(a.push_time) })
       return z
     }
   }
