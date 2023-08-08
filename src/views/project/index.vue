@@ -226,6 +226,11 @@
         <el-form-item v-if="buildForm.language === 'dotnet5.0' || buildForm.language === 'dotnet2.2'" label="包名" label-width="80px" prop="package_name">
           <el-input v-model="buildForm.package_name" style="width: 425px;" placeholder="编译生成出的可执行文件名" />
         </el-form-item>
+
+        <el-form-item v-if="buildForm.language === 'vue'" label="编译指令" label-width="80px" prop="command">
+          <el-input v-model="buildForm.command" style="width: 425px;" />
+        </el-form-item>
+
         <el-form-item label="镜像源" label-width="80px" prop="image_source">
           <el-select v-model="buildForm.image_source" style="width: 425px;" placeholder="请选择镜像版本">
             <el-option label="Dotnet Frame 5.0" value="harbor.chengdd.cn/base/dotnet_aspnet:5.0" />
@@ -381,7 +386,7 @@ export default {
         repository: '',
         dependent_repository: 'git@gitlab.mojorycorp.cn:mojory/commonlibs.git',
         dependent_project: 'commonlibs',
-        // sub_name: '',
+        command: '', // 项目编译指令
         branch: '',
         short_id: '',
         dependent_branch: 'release_20220418',
@@ -426,6 +431,9 @@ export default {
         ],
         package_name: [
           { required: true, message: '必须填写包名', trigger: 'submit' }
+        ],
+        command: [
+          { required: true, message: '必须输入编译指令', trigger: 'submit' }
         ]
       },
       // addition规则
