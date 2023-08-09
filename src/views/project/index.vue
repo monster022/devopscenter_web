@@ -217,9 +217,6 @@
         <el-form-item v-if="buildForm.depend === true" label="依赖仓库" label-width="80px">
           <el-input v-model="buildForm.dependent_repository" style="width: 425px;" :disabled="true" />
         </el-form-item>
-        <!-- <el-form-item v-if="buildForm.include_subname === true" label="子名称" label-width="80px">
-          <el-input v-model="buildForm.sub_name" style="width: 425px;" placeholder="一个项目包含多个子项目时填写" />
-        </el-form-item> -->
         <el-form-item v-if="buildForm.language === 'dotnet5.0' || buildForm.language === 'dotnet2.2'" label="构建路径" label-width="80px" prop="build_path">
           <el-input v-model="buildForm.build_path" style="width: 425px;" placeholder=".cspro文件所在路径" />
         </el-form-item>
@@ -227,8 +224,8 @@
           <el-input v-model="buildForm.package_name" style="width: 425px;" placeholder="编译生成出的可执行文件名" />
         </el-form-item>
 
-        <el-form-item v-if="buildForm.language === 'vue'" label="编译指令" label-width="80px" prop="command" placeholder="请输入编译指令">
-          <el-input v-model="buildForm.command" style="width: 425px;" />
+        <el-form-item v-if="buildForm.language === 'vue'" label="编译指令" label-width="80px" prop="command">
+          <el-input v-model="buildForm.command" style="width: 425px;" placeholder="使用 && 连接符,例如:  npm i && npm run build" />
         </el-form-item>
 
         <el-form-item label="镜像源" label-width="80px" prop="image_source">
@@ -717,6 +714,7 @@ export default {
         if (this.deployForm.urgen === false) {
           const data = {
             env: this.deployForm.env,
+            publish_type: "Kubernetes",
             deployment_name: this.deployForm.name,
             namespace: this.deployForm.namespace,
             container_name: this.deployForm.container_name,
@@ -735,6 +733,7 @@ export default {
         } else {
           const data = {
             env: this.deployForm.env,
+            publish_type: "Docker",
             deployment_name: this.deployForm.name,
             namespace: this.deployForm.namespace,
             container_name: this.deployForm.container_name,
