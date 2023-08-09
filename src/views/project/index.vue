@@ -227,7 +227,7 @@
           <el-input v-model="buildForm.package_name" style="width: 425px;" placeholder="编译生成出的可执行文件名" />
         </el-form-item>
 
-        <el-form-item v-if="buildForm.language === 'vue'" label="编译指令" label-width="80px" prop="command">
+        <el-form-item v-if="buildForm.language === 'vue'" label="编译指令" label-width="80px" prop="command" placeholder="请输入编译指令">
           <el-input v-model="buildForm.command" style="width: 425px;" />
         </el-form-item>
 
@@ -331,9 +331,6 @@ import { getSpecifyDeployMent, patchDeploymentImage } from '@/api/deployment'
 
 export default {
   data() {
-    // const generateData = _ => {
-
-    // }
     return {
       // title
       deploy_title: '',
@@ -461,27 +458,6 @@ export default {
       }
       return data
     },
-    // renderHeader(h, { column, $index }) {
-    //   const index = $index
-    //   let msg = 'default'
-    //   if (index === 1) {
-    //     msg = 'GitLab中的名称'
-    //   } else if (index === 2) {
-    //     msg = 'K8s中DeployMent的名称'
-    //   }
-    //   return h('div', [
-    //     h('span', column.label),
-    //     h('i', {
-    //       class: 'el-icon-info',
-    //       style: {
-    //         marginLeft: '5px'
-    //       },
-    //       attrs: {
-    //         title: msg
-    //       }
-    //     })
-    //   ])
-    // },
     buildType(id, status) {
       let bk = false
       if (this.bId || status === 0) {
@@ -649,7 +625,7 @@ export default {
       this.buildForm.package_name = row.package_name
       this.buildForm.env = ''
       this.buildForm.branch = ''
-      // this.buildForm.sub_name = ''
+      this.buildForm.command = ''
       this.buildForm.image_source = ''
       this.buildForm.authorName = ''
       this.buildForm.message = ''
@@ -677,7 +653,7 @@ export default {
             dependent_repository: this.buildForm.dependent_repository,
             project: this.buildForm.name,
             dependent_project: this.buildForm.dependent_project,
-            // sub_name: this.buildForm.sub_name,
+            command: this.buildForm.command,
             branch: this.buildForm.branch,
             short_id: this.buildForm.short_id,
             dependent_branch: this.buildForm.dependent_branch,
@@ -687,7 +663,6 @@ export default {
             alias_name: this.buildForm.alias_name,
             create_by: window.localStorage.getItem('username')
           }
-          console.log(this.buildForm.short_id)
           postJenkinsJobBuild(data).then(response => {
             this.bId = this.buildForm.id
             this.$message({
