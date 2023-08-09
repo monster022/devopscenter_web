@@ -148,7 +148,7 @@
     </el-dialog>
 
     <!-- 构建 -->
-    <el-dialog title="构建" :visible.sync="buildDialogVisible" width="600px" center>
+    <el-dialog :title="build_title" :visible.sync="buildDialogVisible" width="600px" center>
       <el-form ref="buildForm" :model="buildForm" :rules="buildRules">
         <el-row>
           <el-col :span="12">
@@ -217,15 +217,17 @@
         <el-form-item v-if="buildForm.depend === true" label="依赖仓库" label-width="80px">
           <el-input v-model="buildForm.dependent_repository" style="width: 425px;" :disabled="true" />
         </el-form-item>
-        <!-- <el-form-item v-if="buildForm.include_subname === true" label="子名称" label-width="80px">
-          <el-input v-model="buildForm.sub_name" style="width: 425px;" placeholder="一个项目包含多个子项目时填写" />
-        </el-form-item> -->
         <el-form-item v-if="buildForm.language === 'dotnet5.0' || buildForm.language === 'dotnet2.2'" label="构建路径" label-width="80px" prop="build_path">
           <el-input v-model="buildForm.build_path" style="width: 425px;" placeholder=".cspro文件所在路径" />
         </el-form-item>
         <el-form-item v-if="buildForm.language === 'dotnet5.0' || buildForm.language === 'dotnet2.2'" label="包名" label-width="80px" prop="package_name">
           <el-input v-model="buildForm.package_name" style="width: 425px;" placeholder="编译生成出的可执行文件名" />
         </el-form-item>
+
+        <el-form-item v-if="buildForm.language === 'vue'" label="编译指令" label-width="80px" prop="command">
+          <el-input v-model="buildForm.command" style="width: 425px;" placeholder="使用 && 连接符,例如:  npm i && npm run build" />
+        </el-form-item>
+
         <el-form-item label="镜像源" label-width="80px" prop="image_source">
           <el-select v-model="buildForm.image_source" style="width: 425px;" placeholder="请选择镜像版本">
             <el-option label="Dotnet Frame 5.0" value="harbor.chengdd.cn/base/dotnet_aspnet:5.0" />
@@ -242,7 +244,7 @@
     </el-dialog>
 
     <!-- 发布 -->
-    <el-dialog title="发布" :visible.sync="deployDialogVisible" width="600px" center>
+    <el-dialog :title="deploy_title" :visible.sync="deployDialogVisible" width="600px" center>
       <el-form :model="deployForm">
         <el-form-item label="发布方式" label-width="80px">
           <el-radio-group v-model="deployForm.publish_type">
@@ -326,10 +328,10 @@ import { getSpecifyDeployMent, patchDeploymentImage } from '@/api/deployment'
 
 export default {
   data() {
-    // const generateData = _ => {
-
-    // }
     return {
+      // title
+      deploy_title: '',
+      build_title: '',
       bId: '',				// 选定的id
       list: null,
       fullscreenLoading: false,
@@ -378,7 +380,7 @@ export default {
         repository: '',
         dependent_repository: 'git@gitlab.mojorycorp.cn:mojory/commonlibs.git',
         dependent_project: 'commonlibs',
-        // sub_name: '',
+        command: '', // 项目编译指令
         branch: '',
         short_id: '',
         dependent_branch: 'release_20220418',
@@ -423,6 +425,9 @@ export default {
         ],
         package_name: [
           { required: true, message: '必须填写包名', trigger: 'submit' }
+        ],
+        command: [
+          { required: true, message: '必须输入编译指令', trigger: 'submit' }
         ]
       },
       // addition规则
@@ -450,27 +455,6 @@ export default {
       }
       return data
     },
-    // renderHeader(h, { column, $index }) {
-    //   const index = $index
-    //   let msg = 'default'
-    //   if (index === 1) {
-    //     msg = 'GitLab中的名称'
-    //   } else if (index === 2) {
-    //     msg = 'K8s中DeployMent的名称'
-    //   }
-    //   return h('div', [
-    //     h('span', column.label),
-    //     h('i', {
-    //       class: 'el-icon-info',
-    //       style: {
-    //         marginLeft: '5px'
-    //       },
-    //       attrs: {
-    //         title: msg
-    //       }
-    //     })
-    //   ])
-    // },
     buildType(id, status) {
       let bk = false
       if (this.bId || status === 0) {
@@ -623,6 +607,7 @@ export default {
       this.fetchData()
     },
     buildOpen(row) {
+      this.build_title = row.language + ' ' + row.alias_name + ' 项目构建'
       const params = {
         id: row.project_id
       }
@@ -637,7 +622,7 @@ export default {
       this.buildForm.package_name = row.package_name
       this.buildForm.env = ''
       this.buildForm.branch = ''
-      // this.buildForm.sub_name = ''
+      this.buildForm.command = ''
       this.buildForm.image_source = ''
       this.buildForm.authorName = ''
       this.buildForm.message = ''
@@ -665,7 +650,7 @@ export default {
             dependent_repository: this.buildForm.dependent_repository,
             project: this.buildForm.name,
             dependent_project: this.buildForm.dependent_project,
-            // sub_name: this.buildForm.sub_name,
+            command: this.buildForm.command,
             branch: this.buildForm.branch,
             short_id: this.buildForm.short_id,
             dependent_branch: this.buildForm.dependent_branch,
@@ -675,7 +660,6 @@ export default {
             alias_name: this.buildForm.alias_name,
             create_by: window.localStorage.getItem('username')
           }
-          console.log(this.buildForm.short_id)
           postJenkinsJobBuild(data).then(response => {
             this.bId = this.buildForm.id
             this.$message({
@@ -701,6 +685,7 @@ export default {
       })
     },
     deployOpen(row) {
+      this.deploy_title = row.alias_name + ' 项目发布'
       this.deployForm.name = row.alias_name
       this.deployForm.env = ''
       this.deployForm.edition = ''
@@ -729,6 +714,7 @@ export default {
         if (this.deployForm.urgen === false) {
           const data = {
             env: this.deployForm.env,
+            publish_type: "Kubernetes",
             deployment_name: this.deployForm.name,
             namespace: this.deployForm.namespace,
             container_name: this.deployForm.container_name,
@@ -747,6 +733,7 @@ export default {
         } else {
           const data = {
             env: this.deployForm.env,
+            publish_type: "Docker",
             deployment_name: this.deployForm.name,
             namespace: this.deployForm.namespace,
             container_name: this.deployForm.container_name,
@@ -855,7 +842,8 @@ export default {
         return []
       }
       const z = data.slice() // 创建data的浅拷贝
-      z.sort(function(a, b) { return b.created.localeCompare(a.created) })
+      // z.sort(function(a, b) { return b.push_time.localeCompare(a.push_time) })
+      z.sort(function(a, b) { return b.push_time.localeCompare(a.push_time) })
       return z
     }
   }

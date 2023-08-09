@@ -66,7 +66,7 @@ export const constantRoutes = [
       },
       {
         path: 'detail/:project',
-        meta: { title: '构建详情页' },
+        meta: { title: '项目详情页' },
         component: () => import('@/views/project/detail/index'),
         hidden: true
       }
@@ -80,8 +80,8 @@ export const constantRoutes = [
       {
         path: 'index',
         component: () => import('@/views/machine/index'),
-        meta: { title: 'Machine', icon: 'el-icon-cpu' },
-        hidden: true
+        meta: { title: 'Machine', icon: 'el-icon-cpu' }
+        // hidden: true
       }
     ]
   },
@@ -129,7 +129,7 @@ export const constantRoutes = [
     redirect: '/kubernetes/table',
     name: 'Kubernetes',
     meta: { title: 'Kubernetes', icon: 'el-icon-cloudy' },
-    hidden: true,
+    // hidden: true,
     children: [
       {
         path: 'deployment',
