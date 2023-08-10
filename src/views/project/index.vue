@@ -98,6 +98,7 @@
             <el-option label="Dotnet5.0" value="dotnet5.0" />
             <el-option label="Golang" value="go" />
             <el-option label="Vue" value="vue" />
+            <el-option label="Html" value="html" />
           </el-select>
         </el-form-item>
         <el-form-item v-if="additionForm.language == 'dotnet5.0' || additionForm.language == 'dotnet2.2'" label="构建路径" label-width="100px">
