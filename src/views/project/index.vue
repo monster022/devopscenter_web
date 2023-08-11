@@ -237,6 +237,11 @@
             <el-option label="Golang Version alpine" value="golang:alpine" />
           </el-select>
         </el-form-item>
+
+        <el-form-item label="备注" label-width="80px">
+          <el-input type="textarea" :rows="2" v-model="buildForm.remark" style="width: 425px;" />
+        </el-form-item>
+
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button size="medium" @click="buildDialogVisible = false">取 消</el-button>
@@ -388,7 +393,7 @@ export default {
         build_path: '',
         package_name: '',
         image_source: '',
-        // include_subname: false,
+        remark: '', // 备注信息
         depend: false,
         authorName: '',
         alias_name: '', // 项目别名
@@ -629,6 +634,7 @@ export default {
       this.buildForm.message = ''
       this.buildForm.alias_name = row.alias_name
       this.buildForm.pid = row.project_id
+      this.buildForm.remark = row.remark
       this.buildDialogVisible = true
     },
     branchChangeCommit() {
