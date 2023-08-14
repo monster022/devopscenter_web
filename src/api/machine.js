@@ -47,3 +47,10 @@ export function getPublishMachineList(id) {
     method: 'get'
   })
 }
+
+export function getDownloadMachine() {
+  return request({
+    url: '/download',
+    method: 'get'
+  })
+}

@@ -239,7 +239,7 @@
         </el-form-item>
 
         <el-form-item label="备注" label-width="80px">
-          <el-input type="textarea" :rows="2" v-model="buildForm.remark" style="width: 425px;" />
+          <el-input v-model="buildForm.remark" type="textarea" :rows="2" style="width: 425px;" />
         </el-form-item>
 
       </el-form>
@@ -721,7 +721,7 @@ export default {
         if (this.deployForm.urgen === false) {
           const data = {
             env: this.deployForm.env,
-            publish_type: "Kubernetes",
+            publish_type: 'Kubernetes',
             deployment_name: this.deployForm.name,
             namespace: this.deployForm.namespace,
             container_name: this.deployForm.container_name,
@@ -740,7 +740,7 @@ export default {
         } else {
           const data = {
             env: this.deployForm.env,
-            publish_type: "Docker",
+            publish_type: 'Docker',
             deployment_name: this.deployForm.name,
             namespace: this.deployForm.namespace,
             container_name: this.deployForm.container_name,
