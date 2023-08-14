@@ -7,7 +7,7 @@
         <i slot="prefix" class="el-input__icon el-icon-search" />
       </el-input>
       <download-excel ref="jsonExcel" :data="excel_data" :fields="excel_fields" name="machine">
-        <el-button style="float: right;" type="text" icon="el-icon-download">导出数据</el-button>
+        <el-button style="float: right;margin-right: 20px;" type="text" icon="el-icon-download">导出数据</el-button>
       </download-excel>
     </div>
 
