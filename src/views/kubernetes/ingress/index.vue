@@ -1,6 +1,5 @@
 <template>
   <div class="app-contianer">
-
     <div style="float: left; margin-left:20px; margin-top:20px;">
       <label style="width: 80px; font-weight: normal;">环境</label>
       <el-select v-model="title.env" style="width: 200px; margin-left:20px;" placeholder="请选择环境" @change="envChange()">
@@ -18,7 +17,7 @@
       <el-button type="primary" icon="el-icon-circle-plus-outline" @click="addResource()">添加资源</el-button>
     </div>
 
-    <el-table :data="list" max-height="790">
+    <el-table :data="list" max-height="780">
       <el-table-column label="序号" width="95" header-align="center" align="center">
         <template slot-scope="scope">
           {{ scope.row.id }}
@@ -29,19 +28,14 @@
           {{ scope.row.name }}
         </template>
       </el-table-column>
-      <el-table-column label="容器名" header-align="center" align="center">
+      <el-table-column label="域名" header-align="center" align="center">
         <template slot-scope="scope">
-          {{ scope.row.container_name }}
+          {{ scope.row.host }}
         </template>
       </el-table-column>
-      <el-table-column label="镜像" header-align="center" align="center" show-overflow-tooltip>
+      <el-table-column label="路径" header-align="center" align="center">
         <template slot-scope="scope">
-          {{ scope.row.image }}
-        </template>
-      </el-table-column>
-      <el-table-column label="副本数" header-align="center" align="center">
-        <template slot-scope="scope">
-          {{ scope.row.replicate }}
+          {{ scope.row.path }}
         </template>
       </el-table-column>
       <el-table-column fixed="right" label="操作" header-align="center" align="center">
@@ -54,50 +48,10 @@
 
     <el-pagination layout="total, prev, pager, next" :hide-on-single-page="true" :total="total" :current-page.sync="currentPage" :page-size="size" @prev-click="pageChange" @next-click="pageChange" @current-change="pageChange" />
 
-    <el-dialog title="添加Deployment资源" :visible.sync="addResourceDialogVisible" width="600px" center>
+    <el-dialog title="添加 资源" :visible.sync="addResourceDialogVisible" width="600px" center>
       <el-form ref="addResourceForm" :model="addResourceForm">
-        <el-row>
-          <el-col :span="12">
-            <el-form-item label="环境" label-width="70px" prop="name">
-              <el-select v-model="addResourceForm.env" style="width: 150px;" placeholder="请选择环境">
-                <el-option label="dev" value="dev" />
-                <el-option label="uat" value="uat" />
-                <el-option label="fat" value="fat" />
-                <el-option label="pro" value="pro" />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="名称空间" label-width="70px" prop="name">
-              <el-select v-model="addResourceForm.namespace" style="width: 150px;" placeholder="请选择名称空间">
-                <el-option label="dev" value="dev" />
-                <el-option label="uat" value="uat" />
-                <el-option label="fat" value="fat" />
-                <el-option label="prod" value="prod" />
-              </el-select>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row>
-          <el-col :span="12">
-            <el-form-item label="名称" label-width="70px" prop="name">
-              <el-input v-model="addResourceForm.name" style="width: 150px;" placeholder="请输入名称" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="副本数" label-width="70px" prop="name">
-              <el-input-number v-model="addResourceForm.replicas" style="width: 150px;" :min="1" :max="5" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-form-item label="镜像" label-width="70px">
-          <el-input v-model="addResourceForm.image" style="width: 425px;" placeholder="请输入镜像" />
-        </el-form-item>
-        <el-form-item label="关联配置" label-width="70px">
-          <el-switch v-model="addResourceForm.switchConfig" />
-        </el-form-item>
-        <el-form-item v-if="addResourceForm.switchConfig === true" label="配置项" label-width="70px">
-          <el-input v-model="addResourceForm.configName" style="width: 425px;" placeholder="请输入配置项名称" />
+        <el-form-item label="xx" label-width="70px" prop="name">
+          <el-input v-model="addResourceForm.image" style="width: 425px;" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -112,7 +66,7 @@
 <script>
 
 import { getNameSpaceList } from '@/api/namespace'
-import { getDeployMentListV2 } from '@/api/deployment'
+import { getIngressListV2 } from '@/api/ingress'
 
 export default {
   data() {
@@ -124,10 +78,9 @@ export default {
         namespace: '',
         name: '',
         image: '',
-        replicas: 1,
-        switchConfig: false,
-        configName: ''
+        replicas: 1
       },
+      // 表中数据
       list: null,
       title: {
         env: 'dev',
@@ -162,7 +115,7 @@ export default {
           size: this.size,
           page: this.currentPage
         }
-        getDeployMentListV2(params).then(response => {
+        getIngressListV2(params).then(response => {
           this.list = response.data
         })
       }
@@ -172,10 +125,10 @@ export default {
       const params = {
         env: this.title.env,
         namespace: this.title.namespace,
-        page: 1,
-        size: 12
+        size: this.size,
+        page: this.currentPage
       }
-      getDeployMentListV2(params).then(response => {
+      getIngressListV2(params).then(response => {
         this.list = response.data
         this.total = response.total
       })
@@ -186,23 +139,10 @@ export default {
     },
 
     addResource() {
-      this.addResourceForm.env = ''
-      this.addResourceForm.namespace = ''
-      this.addResourceForm.name = ''
-      this.addResourceForm.replicas = ''
-      this.addResourceForm.image = ''
       this.addResourceDialogVisible = true
     },
 
     addResourceSubmit() {
-      const data = {
-        env: this.addResourceForm.env,
-        namespace: this.addResourceForm.namespace,
-        name: this.addResourceForm.name,
-        replicas: this.addResourceForm.replicas,
-        image: this.addResourceForm.image
-      }
-      console.log(data)
       this.addResourceDialogVisible = false
     }
   }

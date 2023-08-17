@@ -29,19 +29,24 @@
           {{ scope.row.name }}
         </template>
       </el-table-column>
-      <el-table-column label="容器名" header-align="center" align="center">
+      <el-table-column label="服务类型" header-align="center" align="center">
         <template slot-scope="scope">
-          {{ scope.row.container_name }}
+          {{ scope.row.type }}
         </template>
       </el-table-column>
-      <el-table-column label="镜像" header-align="center" align="center" show-overflow-tooltip>
+      <el-table-column label="端口" header-align="center" align="center">
         <template slot-scope="scope">
-          {{ scope.row.image }}
+          {{ scope.row.port }}
         </template>
       </el-table-column>
-      <el-table-column label="副本数" header-align="center" align="center">
+      <el-table-column label="端口名称" header-align="center" align="center">
         <template slot-scope="scope">
-          {{ scope.row.replicate }}
+          {{ scope.row.port_name }}
+        </template>
+      </el-table-column>
+      <el-table-column label="目标端口" header-align="center" align="center">
+        <template slot-scope="scope">
+          {{ scope.row.target_port }}
         </template>
       </el-table-column>
       <el-table-column fixed="right" label="操作" header-align="center" align="center">
@@ -52,9 +57,11 @@
       </el-table-column>
     </el-table>
 
+    <!-- 分页 -->
     <el-pagination layout="total, prev, pager, next" :hide-on-single-page="true" :total="total" :current-page.sync="currentPage" :page-size="size" @prev-click="pageChange" @next-click="pageChange" @current-change="pageChange" />
 
-    <el-dialog title="添加Deployment资源" :visible.sync="addResourceDialogVisible" width="600px" center>
+    <!-- 添加资源表单 -->
+    <el-dialog title="添加service资源" :visible.sync="addResourceDialogVisible" width="600px" center>
       <el-form ref="addResourceForm" :model="addResourceForm">
         <el-row>
           <el-col :span="12">
@@ -78,27 +85,39 @@
             </el-form-item>
           </el-col>
         </el-row>
+        <el-form-item label="名称" label-width="70px" prop="name">
+          <el-input v-model="addResourceForm.name" style="width: 425px;" placeholder="请输入名称" />
+        </el-form-item>
         <el-row>
           <el-col :span="12">
-            <el-form-item label="名称" label-width="70px" prop="name">
-              <el-input v-model="addResourceForm.name" style="width: 150px;" placeholder="请输入名称" />
+            <el-form-item label="协议" label-width="70px" prop="name">
+              <el-select v-model="addResourceForm.protocol" style="width: 150px;" placeholder="请选择协议">
+                <el-option label="TCP" value="TCP" />
+                <el-option label="UDP" value="UDP" />
+              </el-select>
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="副本数" label-width="70px" prop="name">
-              <el-input-number v-model="addResourceForm.replicas" style="width: 150px;" :min="1" :max="5" />
+            <el-form-item label="类型" label-width="70px" prop="name">
+              <el-select v-model="addResourceForm.type" style="width: 150px;" placeholder="请选择类型">
+                <el-option label="ClusterIP" value="ClusterIP" />
+                <el-option label="NodePort" value="NodePort" />
+              </el-select>
             </el-form-item>
           </el-col>
         </el-row>
-        <el-form-item label="镜像" label-width="70px">
-          <el-input v-model="addResourceForm.image" style="width: 425px;" placeholder="请输入镜像" />
-        </el-form-item>
-        <el-form-item label="关联配置" label-width="70px">
-          <el-switch v-model="addResourceForm.switchConfig" />
-        </el-form-item>
-        <el-form-item v-if="addResourceForm.switchConfig === true" label="配置项" label-width="70px">
-          <el-input v-model="addResourceForm.configName" style="width: 425px;" placeholder="请输入配置项名称" />
-        </el-form-item>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="端口" label-width="70px" prop="name">
+              <el-input v-model="addResourceForm.port" style="width: 150px;" placeholder="请输入端口" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="目标端口" label-width="70px" prop="name">
+              <el-input v-model="addResourceForm.target_port" style="width: 150px;" placeholder="请输入目标端口" />
+            </el-form-item>
+          </el-col>
+        </el-row>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button size="medium" @click="addResourceDialogVisible = false">取 消</el-button>
@@ -112,7 +131,7 @@
 <script>
 
 import { getNameSpaceList } from '@/api/namespace'
-import { getDeployMentListV2 } from '@/api/deployment'
+import { getServiceListV2 } from '@/api/service'
 
 export default {
   data() {
@@ -123,11 +142,12 @@ export default {
         env: '',
         namespace: '',
         name: '',
-        image: '',
-        replicas: 1,
-        switchConfig: false,
-        configName: ''
+        port: null,
+        target_port: null,
+        protocol: '',
+        type: ''
       },
+      // 表中数据
       list: null,
       title: {
         env: 'dev',
@@ -162,7 +182,7 @@ export default {
           size: this.size,
           page: this.currentPage
         }
-        getDeployMentListV2(params).then(response => {
+        getServiceListV2(params).then(response => {
           this.list = response.data
         })
       }
@@ -175,7 +195,7 @@ export default {
         page: 1,
         size: 12
       }
-      getDeployMentListV2(params).then(response => {
+      getServiceListV2(params).then(response => {
         this.list = response.data
         this.total = response.total
       })
@@ -189,8 +209,10 @@ export default {
       this.addResourceForm.env = ''
       this.addResourceForm.namespace = ''
       this.addResourceForm.name = ''
-      this.addResourceForm.replicas = ''
-      this.addResourceForm.image = ''
+      this.addResourceForm.port = ''
+      this.addResourceForm.target_port = ''
+      this.addResourceForm.protocol = ''
+      this.addResourceForm.type = ''
       this.addResourceDialogVisible = true
     },
 
@@ -199,8 +221,10 @@ export default {
         env: this.addResourceForm.env,
         namespace: this.addResourceForm.namespace,
         name: this.addResourceForm.name,
-        replicas: this.addResourceForm.replicas,
-        image: this.addResourceForm.image
+        port: this.addResourceForm.port,
+        target_port: this.addResourceForm.target_port,
+        protocol: this.addResourceForm.protocol,
+        type: this.addResourceForm.type
       }
       console.log(data)
       this.addResourceDialogVisible = false

@@ -138,22 +138,22 @@ export const constantRoutes = [
       },
       {
         path: 'configmap',
-        component: () => import('@/views/kubernetes/deployment/index'),
+        component: () => import('@/views/kubernetes/configmap/index'),
         meta: { title: 'ConfigMap', icon: '' }
       },
       {
         path: 'service',
-        component: () => import('@/views/kubernetes/deployment/index'),
+        component: () => import('@/views/kubernetes/service/index'),
         meta: { title: 'Service', icon: '' }
       },
       {
         path: 'ingress',
-        component: () => import('@/views/kubernetes/deployment/index'),
+        component: () => import('@/views/kubernetes/ingress/index.vue'),
         meta: { title: 'Ingress', icon: '' }
       },
       {
         path: 'cronjob',
-        component: () => import('@/views/kubernetes/deployment/index'),
+        component: () => import('@/views/kubernetes/cronjob/index'),
         meta: { title: 'CronJob', icon: '' }
       }
     ]
