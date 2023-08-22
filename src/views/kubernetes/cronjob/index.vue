@@ -38,6 +38,11 @@
           {{ scope.row.image }}
         </template>
       </el-table-column>
+      <el-table-column label="环境变量" header-align="center" align="center" show-overflow-tooltip>
+        <template slot-scope="scope">
+          {{ scope.row.data }}
+        </template>
+      </el-table-column>
       <el-table-column fixed="right" label="操作" header-align="center" align="center">
         <template>
           <el-button type="text" size="small" icon="el-icon-edit">编辑</el-button>
@@ -49,11 +54,11 @@
     <el-pagination layout="total, prev, pager, next" :hide-on-single-page="true" :total="total" :current-page.sync="currentPage" :page-size="size" @prev-click="pageChange" @next-click="pageChange" @current-change="pageChange" />
 
     <el-dialog title="添加cronjob资源" :visible.sync="addResourceDialogVisible" width="600px" center>
-      <el-form ref="addResourceForm" :model="addResourceForm">
+      <el-form ref="addResourceForm" :model="addResourceForm" :rules="addResourceFormRules" label-width="80px">
         <el-row>
           <el-col :span="12">
-            <el-form-item label="环境" label-width="70px" prop="name">
-              <el-select v-model="addResourceForm.env" style="width: 150px;" placeholder="请选择环境">
+            <el-form-item label="环境" prop="env">
+              <el-select v-model="addResourceForm.env" style="width: 150px;" placeholder="请选择环境" @change="envChangeV2()">
                 <el-option label="dev" value="dev" />
                 <el-option label="uat" value="uat" />
                 <el-option label="fat" value="fat" />
@@ -62,35 +67,44 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="名称空间" label-width="70px" prop="name">
+            <el-form-item label="名称空间" prop="namespace">
               <el-select v-model="addResourceForm.namespace" style="width: 150px;" placeholder="请选择名称空间">
-                <el-option label="dev" value="dev" />
-                <el-option label="uat" value="uat" />
-                <el-option label="fat" value="fat" />
-                <el-option label="prod" value="prod" />
+                <el-option v-for="(item, index) in namespaceListV2" :key="index" :label="item.metadata.name" :value="item.metadata.name" />
               </el-select>
             </el-form-item>
           </el-col>
         </el-row>
         <el-row>
           <el-col :span="12">
-            <el-form-item label="名称" label-width="70px" prop="name">
+            <el-form-item label="名称" prop="name">
               <el-input v-model="addResourceForm.name" style="width: 150px;" placeholder="请输入名称" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="时间" label-width="70px" prop="name">
+            <el-form-item label="时间" prop="schedule">
               <el-input v-model="addResourceForm.schedule" style="width: 150px;" placeholder="Cron表达式" />
             </el-form-item>
           </el-col>
         </el-row>
-        <el-form-item label="镜像" label-width="70px" prop="name">
+        <el-form-item label="镜像" prop="image">
           <el-input v-model="addResourceForm.image" style="width: 425px;" placeholder="请输入镜像" />
+        </el-form-item>
+        <el-row>
+          <el-col :span="24">
+            <el-form-item v-for="(item, index) in addResourceForm.data" :key="index" :label="'Env ' + index">
+              <el-input v-model="item.name" style="width: 150px;" placeholder="e.g. foo" />
+              <el-input v-model="item.value" style="width: 150px; margin-left: 50px;" placeholder="e.g. bar" />
+              <el-button type="danger" size="small" circle icon="el-icon-minus" style="margin-left: 40px;" @click="removeItem(index)" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-form-item label-width="70px">
+          <el-button type="primary" size="mini" icon="el-icon-plus" circle @click="addItem" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button size="medium" @click="addResourceDialogVisible = false">取 消</el-button>
-        <el-button size="medium" type="primary" @click="addResourceSubmit()">确 定</el-button>
+        <el-button size="medium" type="primary" @click="addResourceSubmit('addResourceForm')">确 定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -99,7 +113,7 @@
 <script>
 
 import { getNameSpaceList } from '@/api/namespace'
-import { getCronJobListV2 } from '@/api/cronjob'
+import { getCronJobListV2, postCronJob } from '@/api/cronjob'
 
 export default {
   data() {
@@ -111,7 +125,28 @@ export default {
         namespace: '',
         name: '',
         schedule: '',
-        image: ''
+        image: '',
+        data: [{ 'name': '', 'value': '' }]
+      },
+      // 校验表中数据
+      addResourceFormRules: {
+        env: [
+          { required: true, message: '请选择环境', trigger: 'change' }
+        ],
+        namespace: [
+          { required: true, message: '请选择名称空间', trigger: 'change' }
+        ],
+        name: [
+          { required: true, message: '请输入名称', trigger: 'blur' },
+          { pattern: /^[a-z0-9\-]+$/, message: '只能输入小写字母、数字和连字符(-)' },
+          { max: 30, message: '名称不能超过30个字符', trigger: 'blur' }
+        ],
+        schedule: [
+          { required: true, message: '请输入cron表达式', trigger: 'blur' }
+        ],
+        image: [
+          { required: true, message: '请输入完整镜像地址', trigger: 'blur' }
+        ]
       },
       // 表中数据
       list: null,
@@ -120,6 +155,7 @@ export default {
         namespace: ''
       },
       namespaceList: [],
+      namespaceListV2: [],
       total: null,
       currentPage: 1,
       size: 13
@@ -134,6 +170,13 @@ export default {
     })
   },
   methods: {
+    addItem() {
+      this.addResourceForm.data.push({ name: '', value: '' })
+    },
+    removeItem(index) {
+      this.addResourceForm.data.splice(index, 1)
+    },
+
     envChange() {
       const params = {
         env: this.title.env
@@ -152,6 +195,15 @@ export default {
           this.list = response.data
         })
       }
+    },
+
+    envChangeV2() {
+      const params = {
+        env: this.addResourceForm.env
+      }
+      getNameSpaceList(params).then(response => {
+        this.namespaceListV2 = response.data
+      })
     },
 
     namespaceChange() {
@@ -177,11 +229,32 @@ export default {
       this.addResourceForm.name = ''
       this.addResourceForm.schedule = ''
       this.addResourceForm.image = ''
+      this.addResourceForm.data = []
       this.addResourceDialogVisible = true
     },
 
-    addResourceSubmit() {
-      this.addResourceDialogVisible = false
+    addResourceSubmit(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          const data = {
+            env: this.addResourceForm.env,
+            namespace: this.addResourceForm.namespace,
+            name: this.addResourceForm.name,
+            schedule: this.addResourceForm.schedule,
+            image: this.addResourceForm.image,
+            data: this.addResourceForm.data
+          }
+          postCronJob(data).then(response => {
+            this.$message({
+              type: 'success',
+              message: response.message
+            })
+          })
+          this.addResourceDialogVisible = false
+        } else {
+          return false
+        }
+      })
     }
   }
 }

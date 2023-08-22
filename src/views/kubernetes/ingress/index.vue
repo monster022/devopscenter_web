@@ -30,12 +30,12 @@
       </el-table-column>
       <el-table-column label="域名" header-align="center" align="center">
         <template slot-scope="scope">
-          {{ scope.row.host }}
+          {{ scope.row.domain }}
         </template>
       </el-table-column>
-      <el-table-column label="路径" header-align="center" align="center">
+      <el-table-column label="数据" header-align="center" align="center" show-overflow-tooltip>
         <template slot-scope="scope">
-          {{ scope.row.path }}
+          {{ scope.row.data }}
         </template>
       </el-table-column>
       <el-table-column fixed="right" label="操作" header-align="center" align="center">
@@ -48,15 +48,50 @@
 
     <el-pagination layout="total, prev, pager, next" :hide-on-single-page="true" :total="total" :current-page.sync="currentPage" :page-size="size" @prev-click="pageChange" @next-click="pageChange" @current-change="pageChange" />
 
-    <el-dialog title="添加 资源" :visible.sync="addResourceDialogVisible" width="600px" center>
-      <el-form ref="addResourceForm" :model="addResourceForm">
-        <el-form-item label="xx" label-width="70px" prop="name">
-          <el-input v-model="addResourceForm.image" style="width: 425px;" />
+    <el-dialog title="添加Ingress资源" :visible.sync="addResourceDialogVisible" width="600px" center>
+      <el-form ref="addResourceForm" :model="addResourceForm" :rules="addResourceFormFules" label-width="80px">
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="环境" prop="env">
+              <el-select v-model="addResourceForm.env" style="width: 150px" placeholder="请选择环境" @change="envChangeV2()">
+                <el-option label="dev" value="dev" />
+                <el-option label="uat" value="uat" />
+                <el-option label="fat" value="fat" />
+                <el-option label="pro" value="pro" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="名称空间" prop="namespace">
+              <el-select v-model="addResourceForm.namespace" style="width: 150px" placeholder="请选择名称空间">
+                <el-option v-for="(item, index) in namespaceListV2" :key="index" :label="item.metadata.name" :value="item.metadata.name" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-form-item label="名称" prop="name">
+          <el-input v-model="addResourceForm.name" style="width: 425px;" placeholder="请输入名称" />
+        </el-form-item>
+        <el-form-item label="域名" prop="domain">
+          <el-input v-model="addResourceForm.domain" style="width: 425px;" placeholder="请输入域名" />
+        </el-form-item>
+        <el-row>
+          <el-col :span="24">
+            <el-form-item v-for="(item, index) in addResourceForm.rules" :key="index" :label="'路由 ' + index">
+              <el-input v-model="item.path" style="width: 425px;" placeholder="请输入路径" />
+              <el-input v-model="item.target_service" style="width: 160px; margin-top: 20px;" placeholder="请选择后端服务" />
+              <el-input v-model="item.target_port" style="width: 160px; margin-top: 20px; margin-left: 20px;" placeholder="请选择后端端口" />
+              <el-button type="danger" size="small" circle icon="el-icon-minus" style="margin-left: 30px;" @click="removeRules(index)" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-form-item label-width="70px">
+          <el-button type="primary" size="small" icon="el-icon-plus" circle @click="addRules" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button size="medium" @click="addResourceDialogVisible = false">取 消</el-button>
-        <el-button size="medium" type="primary" @click="addResourceSubmit()">确 定</el-button>
+        <el-button size="medium" type="primary" @click="addResourceSubmit('addResourceForm')">确 定</el-button>
       </div>
     </el-dialog>
 
@@ -66,7 +101,7 @@
 <script>
 
 import { getNameSpaceList } from '@/api/namespace'
-import { getIngressListV2 } from '@/api/ingress'
+import { getIngressListV2, postIngress } from '@/api/ingress'
 
 export default {
   data() {
@@ -77,8 +112,25 @@ export default {
         env: '',
         namespace: '',
         name: '',
-        image: '',
-        replicas: 1
+        domain: '',
+        rules: [{ path: '', target_service: '', target_port: null }]
+      },
+      // 校验表单中数据
+      addResourceFormFules: {
+        env: [
+          { required: true, message: '请选择环境', trigger: 'change' }
+        ],
+        namespace: [
+          { required: true, message: '请选择名称空间', trigger: 'change' }
+        ],
+        name: [
+          { required: true, message: '请输入名称', trigger: 'blur' },
+          { pattern: /^[a-z0-9\-]+$/, message: '只能输入小写字母、数字和连字符(-)' },
+          { max: 30, message: '名称不能超过30个字符', trigger: 'blur' }
+        ],
+        domain: [
+          { required: true, message: '请输入域名, e.g. www.chengduoduo.com', trigger: 'blur' }
+        ]
       },
       // 表中数据
       list: null,
@@ -87,6 +139,7 @@ export default {
         namespace: ''
       },
       namespaceList: [],
+      namespaceListV2: [],
       total: null,
       currentPage: 1,
       size: 13
@@ -101,6 +154,13 @@ export default {
     })
   },
   methods: {
+    addRules() {
+      this.addResourceForm.rules.push({ path: '', target_service: '', target_port: '' })
+    },
+    removeRules(index) {
+      this.addResourceForm.rules.splice(index, 1)
+    },
+
     envChange() {
       const params = {
         env: this.title.env
@@ -121,6 +181,15 @@ export default {
       }
     },
 
+    envChangeV2() {
+      const params = {
+        env: this.addResourceForm.env
+      }
+      getNameSpaceList(params).then(response => {
+        this.namespaceListV2 = response.data
+      })
+    },
+
     namespaceChange() {
       const params = {
         env: this.title.env,
@@ -139,11 +208,38 @@ export default {
     },
 
     addResource() {
+      this.addResourceForm.env = ''
+      this.addResourceForm.namespace = ''
+      this.addResourceForm.name = ''
+      this.addResourceForm.domain = ''
       this.addResourceDialogVisible = true
     },
 
-    addResourceSubmit() {
-      this.addResourceDialogVisible = false
+    addResourceSubmit(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          this.addResourceForm.rules.forEach(rule => {
+            rule.target_port = parseInt(rule.target_port)
+          })
+          const data = {
+            env: this.addResourceForm.env,
+            namespace: this.addResourceForm.namespace,
+            name: this.addResourceForm.name,
+            domain: this.addResourceForm.domain,
+            rules: this.addResourceForm.rules
+          }
+          postIngress(data).then(response => {
+            this.$message({
+              type: 'success',
+              message: response.message
+            })
+          })
+          console.log(data)
+          this.addResourceDialogVisible = false
+        } else {
+          return false
+        }
+      })
     }
   }
 }

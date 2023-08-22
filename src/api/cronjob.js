@@ -15,3 +15,11 @@ export function getCronJobListV2(params) {
     params
   })
 }
+
+export function postCronJob(data) {
+  return request({
+    url: '/cronjob',
+    method: 'post',
+    data
+  })
+}

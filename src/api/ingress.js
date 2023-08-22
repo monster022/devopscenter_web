@@ -15,3 +15,11 @@ export function getIngressListV2(params) {
     params
   })
 }
+
+export function postIngress(data) {
+  return request({
+    url: '/ingress',
+    method: 'post',
+    data
+  })
+}

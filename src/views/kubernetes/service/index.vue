@@ -29,24 +29,29 @@
           {{ scope.row.name }}
         </template>
       </el-table-column>
-      <el-table-column label="服务类型" header-align="center" align="center">
-        <template slot-scope="scope">
-          {{ scope.row.type }}
-        </template>
-      </el-table-column>
       <el-table-column label="端口" header-align="center" align="center">
         <template slot-scope="scope">
           {{ scope.row.port }}
         </template>
       </el-table-column>
-      <el-table-column label="端口名称" header-align="center" align="center">
+      <el-table-column label="协议" header-align="center" align="center">
         <template slot-scope="scope">
-          {{ scope.row.port_name }}
+          {{ scope.row.protocol }}
         </template>
       </el-table-column>
       <el-table-column label="目标端口" header-align="center" align="center">
         <template slot-scope="scope">
           {{ scope.row.target_port }}
+        </template>
+      </el-table-column>
+      <el-table-column label="类型" header-align="center" align="center">
+        <template slot-scope="scope">
+          {{ scope.row.type }}
+        </template>
+      </el-table-column>
+      <el-table-column label="Deployment" header-align="center" align="center">
+        <template slot-scope="scope">
+          {{ scope.row.deployment }}
         </template>
       </el-table-column>
       <el-table-column fixed="right" label="操作" header-align="center" align="center">
@@ -62,11 +67,11 @@
 
     <!-- 添加资源表单 -->
     <el-dialog title="添加service资源" :visible.sync="addResourceDialogVisible" width="600px" center>
-      <el-form ref="addResourceForm" :model="addResourceForm">
+      <el-form ref="addResourceForm" :model="addResourceForm" :rules="addResourceFormRules">
         <el-row>
           <el-col :span="12">
-            <el-form-item label="环境" label-width="70px" prop="name">
-              <el-select v-model="addResourceForm.env" style="width: 150px;" placeholder="请选择环境">
+            <el-form-item label="环境" label-width="80px" prop="env">
+              <el-select v-model="addResourceForm.env" style="width: 150px;" placeholder="请选择环境" @change="envChangeV2()">
                 <el-option label="dev" value="dev" />
                 <el-option label="uat" value="uat" />
                 <el-option label="fat" value="fat" />
@@ -75,22 +80,19 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="名称空间" label-width="70px" prop="name">
+            <el-form-item label="名称空间" label-width="80px" prop="namespace">
               <el-select v-model="addResourceForm.namespace" style="width: 150px;" placeholder="请选择名称空间">
-                <el-option label="dev" value="dev" />
-                <el-option label="uat" value="uat" />
-                <el-option label="fat" value="fat" />
-                <el-option label="prod" value="prod" />
+                <el-option v-for="(item, index) in namespaceListV2" :key="index" :label="item.metadata.name" :value="item.metadata.name" />
               </el-select>
             </el-form-item>
           </el-col>
         </el-row>
-        <el-form-item label="名称" label-width="70px" prop="name">
+        <el-form-item label="名称" label-width="80px" prop="name">
           <el-input v-model="addResourceForm.name" style="width: 425px;" placeholder="请输入名称" />
         </el-form-item>
         <el-row>
           <el-col :span="12">
-            <el-form-item label="协议" label-width="70px" prop="name">
+            <el-form-item label="协议" label-width="80px" prop="protocol">
               <el-select v-model="addResourceForm.protocol" style="width: 150px;" placeholder="请选择协议">
                 <el-option label="TCP" value="TCP" />
                 <el-option label="UDP" value="UDP" />
@@ -98,7 +100,7 @@
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="类型" label-width="70px" prop="name">
+            <el-form-item label="类型" label-width="80px" prop="type">
               <el-select v-model="addResourceForm.type" style="width: 150px;" placeholder="请选择类型">
                 <el-option label="ClusterIP" value="ClusterIP" />
                 <el-option label="NodePort" value="NodePort" />
@@ -108,20 +110,26 @@
         </el-row>
         <el-row>
           <el-col :span="12">
-            <el-form-item label="端口" label-width="70px" prop="name">
+            <el-form-item label="端口" label-width="80px" prop="port">
               <el-input v-model="addResourceForm.port" style="width: 150px;" placeholder="请输入端口" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="目标端口" label-width="70px" prop="name">
+            <el-form-item label="目标端口" label-width="80px" prop="target_port">
               <el-input v-model="addResourceForm.target_port" style="width: 150px;" placeholder="请输入目标端口" />
             </el-form-item>
           </el-col>
         </el-row>
+        <el-form-item label="关联应用" label-width="80px">
+          <el-switch v-model="addResourceForm.deploymentSwitch" />
+        </el-form-item>
+        <el-form-item v-if="addResourceForm.deploymentSwitch === true" label="应用名" label-width="80px" prop="deployment">
+          <el-input v-model="addResourceForm.deployment" style="width: 425px;" placeholder="请选择应用" />
+        </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button size="medium" @click="addResourceDialogVisible = false">取 消</el-button>
-        <el-button size="medium" type="primary" @click="addResourceSubmit()">确 定</el-button>
+        <el-button size="medium" type="primary" @click="addResourceSubmit('addResourceForm')">确 定</el-button>
       </div>
     </el-dialog>
 
@@ -131,7 +139,7 @@
 <script>
 
 import { getNameSpaceList } from '@/api/namespace'
-import { getServiceListV2 } from '@/api/service'
+import { getServiceListV2, postServiceV2 } from '@/api/service'
 
 export default {
   data() {
@@ -145,7 +153,40 @@ export default {
         port: null,
         target_port: null,
         protocol: '',
-        type: ''
+        type: '',
+        deploymentSwitch: true,
+        deployment: ''
+      },
+      // 校验数据不为空
+      addResourceFormRules: {
+        env: [
+          { required: true, message: '请选择环境', trigger: 'change' }
+        ],
+        namespace: [
+          { required: true, message: '请选择名称空间', trigger: 'change' }
+        ],
+        name: [
+          { required: true, message: '请输入名称', trigger: 'blur' },
+          { pattern: /^[a-z0-9\-]+$/, message: '只能输入小写字母、数字和连字符(-)' },
+          { max: 30, message: '名称不能超过30个字符', trigger: 'blur' }
+        ],
+        port: [
+          { required: true, message: '请输入端口', trigger: 'blur' },
+          { pattern: /^[0-9]+$/, message: '只能输入数字' }
+        ],
+        target_port: [
+          { required: true, message: '请输入目标端口', trigger: 'blur' },
+          { pattern: /^[0-9]+$/, message: '只能输入数字' }
+        ],
+        protocol: [
+          { required: true, message: '请输入协议', trigger: 'blur' }
+        ],
+        type: [
+          { required: true, message: '请输入类型', trigger: 'blur' }
+        ],
+        deployment: [
+          { required: true, message: '请输入需要关联的DeployMent名称', trigger: 'blur' }
+        ]
       },
       // 表中数据
       list: null,
@@ -154,6 +195,7 @@ export default {
         namespace: ''
       },
       namespaceList: [],
+      namespaceListV2: [],
       total: null,
       currentPage: 1,
       size: 13
@@ -188,6 +230,15 @@ export default {
       }
     },
 
+    envChangeV2() {
+      const params = {
+        env: this.addResourceForm.env
+      }
+      getNameSpaceList(params).then(response => {
+        this.namespaceListV2 = response.data
+      })
+    },
+
     namespaceChange() {
       const params = {
         env: this.title.env,
@@ -209,25 +260,38 @@ export default {
       this.addResourceForm.env = ''
       this.addResourceForm.namespace = ''
       this.addResourceForm.name = ''
-      this.addResourceForm.port = ''
-      this.addResourceForm.target_port = ''
+      this.addResourceForm.port = null
+      this.addResourceForm.target_port = null
       this.addResourceForm.protocol = ''
       this.addResourceForm.type = ''
+      this.addResourceForm.deployment = ''
       this.addResourceDialogVisible = true
     },
 
-    addResourceSubmit() {
-      const data = {
-        env: this.addResourceForm.env,
-        namespace: this.addResourceForm.namespace,
-        name: this.addResourceForm.name,
-        port: this.addResourceForm.port,
-        target_port: this.addResourceForm.target_port,
-        protocol: this.addResourceForm.protocol,
-        type: this.addResourceForm.type
-      }
-      console.log(data)
-      this.addResourceDialogVisible = false
+    addResourceSubmit(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          const data = {
+            env: this.addResourceForm.env,
+            namespace: this.addResourceForm.namespace,
+            name: this.addResourceForm.name,
+            port: parseInt(this.addResourceForm.port),
+            target_port: parseInt(this.addResourceForm.target_port),
+            protocol: this.addResourceForm.protocol,
+            type: this.addResourceForm.type,
+            deployment: this.addResourceForm.deployment
+          }
+          postServiceV2(data).then(response => {
+            this.$message({
+              type: 'success',
+              message: response.message
+            })
+          })
+          this.addResourceDialogVisible = false
+        } else {
+          return false
+        }
+      })
     }
   }
 }
