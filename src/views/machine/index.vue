@@ -6,6 +6,9 @@
       <el-input v-model="headInput" style="float: left; width: 200px; margin-left: 30px;" placeholder="请输入IP模糊搜索" @change="fetchData()">
         <i slot="prefix" class="el-input__icon el-icon-search" />
       </el-input>
+      <download-excel ref="jsonExcel" :data="excel_data" :fields="excel_fields" name="machine">
+        <el-button style="float: right;margin-right: 20px;" type="text" icon="el-icon-download">导出数据</el-button>
+      </download-excel>
     </div>
 
     <!-- 表格 -->
@@ -173,7 +176,7 @@
 </template>
 
 <script>
-import { getList, getPassWordList, deleteList, addMachine, patchMachineName } from '@/api/machine'
+import { getList, getPassWordList, deleteList, addMachine, patchMachineName, getDownloadMachine } from '@/api/machine'
 import Terminal from './console.vue'
 
 export default {
@@ -192,6 +195,19 @@ export default {
   },
   data() {
     return {
+      // excel导出数据
+      excel_data: [],
+      excel_fields: {
+        '序号': 'id',
+        '实例名称': 'instance_name',
+        '实例地址': 'instance_ip',
+        '用户名': 'instance_username',
+        '密码': 'instance_password',
+        'CPU/核数': 'instance_cpu',
+        '内存/G': 'instance_memory',
+        '实例状态': 'instance_status',
+        '实例标签': 'instance_tag'
+      },
       // 表头
       headInput: null,
       list: null,
@@ -250,6 +266,9 @@ export default {
       getList(params).then(response => {
         this.list = response.data
         this.total = response.total
+      })
+      getDownloadMachine().then(response => {
+        this.excel_data = response.data
       })
       setTimeout(() => {
         this.fullscreenLoading = false

@@ -15,6 +15,11 @@ import router from './router'
 import '@/icons' // icon
 import '@/permission' // permission control
 
+// json 数据导出excel
+import JsonExcel from 'vue-json-excel'
+
+Vue.component('download-excel', JsonExcel)
+
 /**
  * If you don't want to use mock-server
  * you want to use MockJs for mock api

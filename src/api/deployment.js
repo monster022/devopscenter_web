@@ -32,3 +32,12 @@ export function patchDeploymentImage(data) {
     data
   })
 }
+
+// kubernetes 页面
+export function postDeploymentAdd(data) {
+  return request({
+    url: '/deployment',
+    method: 'post',
+    data
+  })
+}

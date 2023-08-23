@@ -1,6 +1,6 @@
 <template>
   <div class="app-container">
-    <el-tabs tab-position="top" v-model="activeName" style="height: 200px;" @tab-click="handleClick">
+    <el-tabs v-model="activeName" tab-position="top" style="height: 200px;" @tab-click="handleClick">
 
       <!-- 构建详情 -->
       <el-tab-pane label="构建详情" name="first">
@@ -130,7 +130,6 @@
               </template>
             </el-table-column>
           </el-table>
-            
         </div>
       </el-tab-pane>
     </el-tabs>
@@ -168,7 +167,7 @@ export default {
       const params = {
         page: 1,
         size: this.size,
-        publishType: "Kubernetes"
+        publishType: 'Kubernetes'
       }
       // console.log(this.$route.params.project)
       getProjectDetails(this.$route.params.project, params).then(response => {
@@ -181,7 +180,7 @@ export default {
       const params2 = {
         page: 1,
         size: this.size,
-        publishType: "Docker"
+        publishType: 'Docker'
       }
       getProjectDeployDetails(this.$route.params.project, params2).then(response => (
         this.dockerdeployList = response.data
@@ -191,7 +190,7 @@ export default {
       }, 500)
     },
     handleClick(tab, event) {
-      console.log(tab, event);
+      console.log(tab, event)
     }
   }
 }

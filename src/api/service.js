@@ -15,3 +15,11 @@ export function getServiceListV2(params) {
     params
   })
 }
+
+export function postServiceV2(data) {
+  return request({
+    url: '/services',
+    method: 'post',
+    data
+  })
+}

@@ -98,6 +98,7 @@
             <el-option label="Dotnet5.0" value="dotnet5.0" />
             <el-option label="Golang" value="go" />
             <el-option label="Vue" value="vue" />
+            <el-option label="Html" value="html" />
           </el-select>
         </el-form-item>
         <el-form-item v-if="additionForm.language == 'dotnet5.0' || additionForm.language == 'dotnet2.2'" label="构建路径" label-width="100px">
@@ -236,6 +237,11 @@
             <el-option label="Golang Version alpine" value="golang:alpine" />
           </el-select>
         </el-form-item>
+
+        <el-form-item label="备注" label-width="80px">
+          <el-input v-model="buildForm.remark" type="textarea" :rows="2" style="width: 425px;" />
+        </el-form-item>
+
       </el-form>
       <div slot="footer" class="dialog-footer">
         <el-button size="medium" @click="buildDialogVisible = false">取 消</el-button>
@@ -387,7 +393,7 @@ export default {
         build_path: '',
         package_name: '',
         image_source: '',
-        // include_subname: false,
+        remark: '', // 备注信息
         depend: false,
         authorName: '',
         alias_name: '', // 项目别名
@@ -628,6 +634,7 @@ export default {
       this.buildForm.message = ''
       this.buildForm.alias_name = row.alias_name
       this.buildForm.pid = row.project_id
+      this.buildForm.remark = row.remark
       this.buildDialogVisible = true
     },
     branchChangeCommit() {
@@ -714,7 +721,7 @@ export default {
         if (this.deployForm.urgen === false) {
           const data = {
             env: this.deployForm.env,
-            publish_type: "Kubernetes",
+            publish_type: 'Kubernetes',
             deployment_name: this.deployForm.name,
             namespace: this.deployForm.namespace,
             container_name: this.deployForm.container_name,
@@ -733,7 +740,7 @@ export default {
         } else {
           const data = {
             env: this.deployForm.env,
-            publish_type: "Docker",
+            publish_type: 'Docker',
             deployment_name: this.deployForm.name,
             namespace: this.deployForm.namespace,
             container_name: this.deployForm.container_name,
