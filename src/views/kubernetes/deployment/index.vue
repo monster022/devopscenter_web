@@ -65,9 +65,9 @@
         </template>
       </el-table-column>
       <el-table-column fixed="right" label="操作" header-align="center" align="center">
-        <template>
+        <template slot-scope="{row}">
           <el-button type="text" size="small" icon="el-icon-edit">编辑</el-button>
-          <el-button type="text" size="small" icon="el-icon-delete">删除</el-button>
+          <el-button type="text" size="small" icon="el-icon-delete" @click="deleteDeployment(row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -163,7 +163,7 @@
 <script>
 
 import { getNameSpaceList } from '@/api/namespace'
-import { getDeployMentListV2, postDeploymentAdd } from '@/api/deployment'
+import { getDeployMentListV2, postDeploymentAdd, deleteDeployment } from '@/api/deployment'
 
 export default {
   data() {
@@ -327,6 +327,32 @@ export default {
         } else {
           return false
         }
+      })
+    },
+
+    deleteDeployment(val) {
+      const params = {
+        id: val.id,
+        env: this.title.env,
+        namespace: this.title.namespace,
+        deployment: val.name
+      }
+      this.$confirm('此操作将永久删除该记录, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        deleteDeployment(params).then(response => {
+          this.$message({
+            type: 'success',
+            message: response.message
+          })
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
       })
     }
   }

@@ -41,3 +41,11 @@ export function postDeploymentAdd(data) {
     data
   })
 }
+
+export function deleteDeployment(params) {
+  return request({
+    url: '/deployment',
+    method: 'delete',
+    params
+  })
+}
