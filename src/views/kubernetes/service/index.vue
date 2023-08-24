@@ -62,9 +62,6 @@
       </el-table-column>
     </el-table>
 
-    <!-- 分页 -->
-    <el-pagination layout="total, prev, pager, next" :hide-on-single-page="true" :total="total" :current-page.sync="currentPage" :page-size="size" @prev-click="pageChange" @next-click="pageChange" @current-change="pageChange" />
-
     <!-- 添加资源表单 -->
     <el-dialog title="添加service资源" :visible.sync="addResourceDialogVisible" width="600px" center>
       <el-form ref="addResourceForm" :model="addResourceForm" :rules="addResourceFormRules">
@@ -195,10 +192,7 @@ export default {
         namespace: ''
       },
       namespaceList: [],
-      namespaceListV2: [],
-      total: null,
-      currentPage: 1,
-      size: 13
+      namespaceListV2: []
     }
   },
   created() {
@@ -220,9 +214,7 @@ export default {
       if (this.title.namespace !== '') {
         const params = {
           env: this.title.env,
-          namespace: this.title.namespace,
-          size: this.size,
-          page: this.currentPage
+          namespace: this.title.namespace
         }
         getServiceListV2(params).then(response => {
           this.list = response.data
@@ -242,13 +234,10 @@ export default {
     namespaceChange() {
       const params = {
         env: this.title.env,
-        namespace: this.title.namespace,
-        page: 1,
-        size: 12
+        namespace: this.title.namespace
       }
       getServiceListV2(params).then(response => {
         this.list = response.data
-        this.total = response.total
       })
     },
 
