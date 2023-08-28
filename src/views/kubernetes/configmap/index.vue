@@ -19,6 +19,15 @@
     </div>
 
     <el-table :data="list" max-height="800">
+      <el-table-column type="expand" header-align="center" align="center">
+        <template slot-scope="scope">
+          <el-form label-position="left" inline class="demo-table-expand">
+            <el-form-item v-for="(item, index) in parseData(scope.row.data)" :key="index" :label="`${item.key}`">
+              <span>{{ item.value }}</span>
+            </el-form-item>
+          </el-form>
+        </template>
+      </el-table-column>
       <el-table-column label="序号" width="95" header-align="center" align="center">
         <template slot-scope="scope">
           {{ scope.row.id }}
@@ -31,7 +40,7 @@
       </el-table-column>
       <el-table-column label="数据" header-align="center" align="center" show-overflow-tooltip>
         <template slot-scope="scope">
-          {{ parseData(scope.row.data) }}
+          {{ scope.row.data }}
         </template>
       </el-table-column>
       <el-table-column fixed="right" label="操作" header-align="center" align="center">
@@ -110,7 +119,7 @@ export default {
         env: '',
         namespace: '',
         name: '',
-        items: [{ key: '', value: '' }]
+        items: [{ key: '123', value: '' }]
       },
       // 校验表中数据
       addResourceFormRules: {
@@ -231,3 +240,18 @@ export default {
   }
 }
 </script>
+
+<style>
+  .demo-table-expand {
+    font-size: 0;
+  }
+  .demo-table-expand label {
+    width: 400px;
+    color: #99a9bf;
+  }
+  .demo-table-expand .el-form-item {
+    margin-right: 0;
+    margin-bottom: 0;
+    width: 1000px;
+  }
+</style>
