@@ -19,6 +19,15 @@
     </div>
 
     <el-table :data="list" max-height="800">
+      <el-table-column type="expand" header-align="center" align="center">
+        <template slot-scope="scope">
+          <el-form label-position="left" inline class="demo-table-expand">
+            <el-form-item v-for="(item, index) in parseData(scope.row.data)" :key="index" :label="`${item.key}`">
+              <span>{{ item.value }}</span>
+            </el-form-item>
+          </el-form>
+        </template>
+      </el-table-column>
       <el-table-column label="序号" width="95" header-align="center" align="center">
         <template slot-scope="scope">
           {{ scope.row.id }}
@@ -31,7 +40,7 @@
       </el-table-column>
       <el-table-column label="数据" header-align="center" align="center" show-overflow-tooltip>
         <template slot-scope="scope">
-          {{ parseData(scope.row.data) }}
+          {{ scope.row.data }}
         </template>
       </el-table-column>
       <el-table-column fixed="right" label="操作" header-align="center" align="center">
@@ -41,8 +50,6 @@
         </template>
       </el-table-column>
     </el-table>
-
-    <el-pagination layout="total, prev, pager, next" :hide-on-single-page="true" :total="total" :current-page.sync="currentPage" :page-size="size" @prev-click="pageChange" @next-click="pageChange" @current-change="pageChange" />
 
     <el-dialog title="添加ConfigMap资源" :visible.sync="addResourceDialogVisible" width="600px" center>
       <el-form ref="addResourceForm" :model="addResourceForm" :rules="addResourceFormRules">
@@ -112,7 +119,7 @@ export default {
         env: '',
         namespace: '',
         name: '',
-        items: [{ key: '', value: '' }]
+        items: [{ key: '123', value: '' }]
       },
       // 校验表中数据
       addResourceFormRules: {
@@ -135,10 +142,7 @@ export default {
         namespace: ''
       },
       namespaceList: [],
-      namespaceListV2: [],
-      total: null,
-      currentPage: 1,
-      size: 13
+      namespaceListV2: []
     }
   },
   created() {
@@ -173,9 +177,7 @@ export default {
       if (this.title.namespace !== '') {
         const params = {
           env: this.title.env,
-          namespace: this.title.namespace,
-          size: this.size,
-          page: this.currentPage
+          namespace: this.title.namespace
         }
         getConfigMap(params).then(response => {
           this.list = response.data
@@ -195,13 +197,10 @@ export default {
     namespaceChange() {
       const params = {
         env: this.title.env,
-        namespace: this.title.namespace,
-        size: this.size,
-        page: this.currentPage
+        namespace: this.title.namespace
       }
       getConfigMap(params).then(response => {
         this.list = response.data
-        this.total = response.total
       })
     },
 
@@ -241,3 +240,18 @@ export default {
   }
 }
 </script>
+
+<style>
+  .demo-table-expand {
+    font-size: 0;
+  }
+  .demo-table-expand label {
+    width: 400px;
+    color: #99a9bf;
+  }
+  .demo-table-expand .el-form-item {
+    margin-right: 0;
+    margin-bottom: 0;
+    width: 1000px;
+  }
+</style>
