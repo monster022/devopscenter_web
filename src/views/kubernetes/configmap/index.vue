@@ -246,12 +246,12 @@ export default {
     font-size: 0;
   }
   .demo-table-expand label {
-    width: 400px;
+    width: 250px;
     color: #99a9bf;
   }
   .demo-table-expand .el-form-item {
     margin-right: 0;
     margin-bottom: 0;
-    width: 1000px;
+    width: 100%;
   }
 </style>
