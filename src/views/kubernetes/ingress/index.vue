@@ -18,6 +18,19 @@
     </div>
 
     <el-table :data="list" max-height="780">
+      <el-table-column type="expand" width="95" header-align="center" align="center">
+        <template slot-scope="scope">
+          <el-form label-position="left" inline class="demo-table-expand">
+            <el-form-item v-for="(item, index) in parseData(scope.row.data)" :key="index" label="路由">
+              <span>{{ item.path }}</span>
+              <span class="arrow">-&gt;</span>
+              <span>{{ item.target_service }}</span>
+              <span class="arrow">-&gt;</span>
+              <span>{{ item.target_port }}</span>
+            </el-form-item>
+          </el-form>
+        </template>
+      </el-table-column>
       <el-table-column label="序号" width="95" header-align="center" align="center">
         <template slot-scope="scope">
           {{ scope.row.id }}
@@ -155,6 +168,13 @@ export default {
     removeRules(index) {
       this.addResourceForm.rules.splice(index, 1)
     },
+    parseData(data) {
+      try {
+        return JSON.parse(data)
+      } catch (error) {
+        return []
+      }
+    },
 
     envChange() {
       const params = {
@@ -234,3 +254,23 @@ export default {
   }
 }
 </script>
+
+<style>
+  .demo-table-expand {
+    font-size: 0;
+  }
+  .demo-table-expand label {
+    width: 100px;
+    color: #99a9bf;
+  }
+  .demo-table-expand .el-form-item {
+    margin-right: 0;
+    margin-bottom: 0;
+    width: 33%;
+  }
+  .arrow {
+    color: #99a9bf;
+    margin-left: 20px;
+    margin-right: 20px;
+  }
+</style>
