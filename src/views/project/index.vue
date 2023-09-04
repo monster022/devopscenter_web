@@ -500,7 +500,8 @@ export default {
     pageChange(val) {
       const params = {
         page: val,
-        size: this.size
+        size: this.size,
+        name: this.headInput
       }
       getList(params).then(response => {
         this.list = response.data
