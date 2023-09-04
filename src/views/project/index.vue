@@ -1,7 +1,10 @@
 <template>
   <div class="app-container">
     <div>
-      <el-button type="primary" icon="el-icon-plus" @click="additionOpen()">添加项目</el-button>
+      <el-button style="float: left;" type="primary" icon="el-icon-plus" @click="additionOpen()">添加项目</el-button>
+      <el-input v-model="headInput" style="float: left; width: 200px; margin-left: 30px;" placeholder="清输入名称" @change="fetchData()">
+        <i slot="prefix" class="el-input__icon el-icon-search" />
+      </el-input>
     </div>
 
     <el-table
@@ -55,7 +58,6 @@
       </el-table-column>
       <el-table-column label="构建" header-align="center" align="center">
         <template slot-scope="{row}">
-          <!-- <el-button :disabled="row.project_status === 0" type="text" size="mini" @click="buildOpen(row)">build</el-button> -->
           <el-button :disabled="buildType(row.id,row.project_status)" :class="{act: buildLoadingType(row.id)}" :loading="buildLoadingType(row.id)" type="text" size="mini" @click="buildOpen(row)">{{ buildWd(row.id) }}</el-button>
         </template>
       </el-table-column>
@@ -194,11 +196,6 @@
               <el-switch v-model="buildForm.depend" />
             </el-form-item>
           </el-col>
-          <!-- <el-col :span="12">
-            <el-form-item v-if="buildForm.language === 'dotnet5.0' || buildForm.language === 'dotnet2.2'" label="是否包含子项目" label-width="180px">
-              <el-switch v-model="buildForm.include_subname" />
-            </el-form-item>
-          </el-col> -->
         </el-row>
         <el-row>
           <el-col :span="12">
@@ -335,6 +332,8 @@ import { getSpecifyDeployMent, patchDeploymentImage } from '@/api/deployment'
 export default {
   data() {
     return {
+      // search
+      headInput: '',
       // title
       deploy_title: '',
       build_title: '',
@@ -486,7 +485,8 @@ export default {
       this.fullscreenLoading = true
       const params = {
         page: 1,
-        size: this.size
+        size: this.size,
+        name: this.headInput
       }
 
       getList(params).then(response => {
