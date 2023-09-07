@@ -86,6 +86,9 @@
         <el-form-item label="域名" prop="domain">
           <el-input v-model="addResourceForm.domain" style="width: 425px;" placeholder="请输入域名" />
         </el-form-item>
+        <el-form-item label="开启跳转">
+          <el-switch v-model="addResourceForm.rewrite" placeholder="请输入域名" />
+        </el-form-item>
         <el-row>
           <el-col :span="24">
             <el-form-item v-for="(item, index) in addResourceForm.rules" :key="index" :label="'路由 ' + index">
@@ -124,6 +127,7 @@ export default {
         namespace: '',
         name: '',
         domain: '',
+        rewrite: false,
         rules: [{ path: '', target_service: '', target_port: null }]
       },
       // 校验表单中数据
@@ -236,6 +240,7 @@ export default {
             namespace: this.addResourceForm.namespace,
             name: this.addResourceForm.name,
             domain: this.addResourceForm.domain,
+            rewrite: this.addResourceForm.rewrite,
             rules: this.addResourceForm.rules
           }
           postIngress(data).then(response => {
