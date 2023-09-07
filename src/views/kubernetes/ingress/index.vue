@@ -52,8 +52,8 @@
         </template>
       </el-table-column>
       <el-table-column fixed="right" label="操作" header-align="center" align="center">
-        <template>
-          <el-button type="text" size="small" icon="el-icon-edit">编辑</el-button>
+        <template slot-scope="scope">
+          <el-button type="text" size="small" icon="el-icon-edit" @click="editOpen(scope.row)">编辑</el-button>
           <el-button type="text" size="small" icon="el-icon-delete">删除</el-button>
         </template>
       </el-table-column>
@@ -109,6 +109,48 @@
       </div>
     </el-dialog>
 
+    <el-dialog title="更新Ingress资源" :visible.sync="updateResourceDialogVisible" width="600px" center>
+      <el-form :model="editForm" label-width="80px">
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="环境">
+              <el-input v-model="editForm.env" :disabled="true" style="width: 150px;" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="名称空间">
+              <el-input v-model="editForm.namespace" :disabled="true" style="width: 150px;" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-form-item label="名称">
+          <el-input v-model="editForm.name" style="width: 425px;" />
+        </el-form-item>
+        <el-form-item label="域名">
+          <el-input v-model="editForm.domain" style="width: 425px;" />
+        </el-form-item>
+        <el-row>
+          <el-col :span="24">
+            <el-form-item v-for="(item, index) in editForm.rules" :key="index" :label="'路由 ' + index">
+              <el-input v-model="item.path" style="width: 425px;" placeholder="请输入路径" />
+              <el-input v-model="item.target_service" style="width: 160px; margin-top: 20px;" placeholder="请选择后端服务" />
+              <el-input v-model="item.target_port" style="width: 160px; margin-top: 20px; margin-left: 20px;" placeholder="请选择后端端口" />
+
+              <el-button type="danger" size="small" circle icon="el-icon-minus" style="margin-left: 30px;" @click="editRemoveRules(index)" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-form-item>
+          <el-button type="primary" size="small" icon="el-icon-plus" circle @click="editAddRules()" />
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button size="medium" @click="updateResourceDialogVisible = false">取 消</el-button>
+        <el-button size="medium" type="primary" @click="updateResourceDialogVisible = false">确 定</el-button>
+        <el-button size="medium" type="danger" @click="updateResourceDialogVisible = false">还原配置</el-button>
+      </div>
+    </el-dialog>
+
   </div>
 </template>
 
@@ -128,6 +170,16 @@ export default {
         name: '',
         domain: '',
         rewrite: false,
+        rules: [{ path: '', target_service: '', target_port: null }]
+      },
+      // 更新资源弹框
+      updateResourceDialogVisible: false,
+      editForm: {
+        env: '',
+        namespace: '',
+        name: '',
+        domain: '',
+        rewrite: '',
         rules: [{ path: '', target_service: '', target_port: null }]
       },
       // 校验表单中数据
@@ -171,6 +223,12 @@ export default {
     },
     removeRules(index) {
       this.addResourceForm.rules.splice(index, 1)
+    },
+    editAddRules() {
+      this.editForm.rules.push({ path: '', target_service: '', target_port: '' })
+    },
+    editRemoveRules(index) {
+      this.editForm.rules.splice(index, 1)
     },
     parseData(data) {
       try {
@@ -255,6 +313,17 @@ export default {
           return false
         }
       })
+    },
+
+    editOpen(val) {
+      this.editForm.env = this.title.env
+      this.editForm.namespace = this.title.namespace
+      this.editForm.name = val.name
+      this.editForm.domain = val.domain
+      this.editForm.rewrite = false
+      this.editForm.rules = this.parseData(val.data)
+      this.updateResourceDialogVisible = true
+      console.log(val)
     }
   }
 }
