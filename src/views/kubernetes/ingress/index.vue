@@ -54,7 +54,7 @@
       <el-table-column fixed="right" label="操作" header-align="center" align="center">
         <template slot-scope="scope">
           <el-button type="text" size="small" icon="el-icon-edit" @click="editOpen(scope.row)">编辑</el-button>
-          <el-button type="text" size="small" icon="el-icon-delete">删除</el-button>
+          <el-button type="text" size="small" icon="el-icon-delete" @click="deleteIngress(scope.row)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -151,6 +151,15 @@
       </div>
     </el-dialog>
 
+    <el-dialog title="删除Ingress资源" :visible.sync="deleteResourceDialogVisible" width="450px" top="400px">
+      <span>you are sure delete this resource</span>
+      <div slot="footer" class="dialog-footer">
+        <el-button size="medium" @click="deleteResourceDialogVisible = false">取 消</el-button>
+        <el-button size="medium" @click="deleteResourceDialogVisible = false">删 除 </el-button>
+        <el-button size="medium" @click="deleteResourceDialogVisible = false">彻底删除</el-button>
+      </div>
+    </el-dialog>
+
   </div>
 </template>
 
@@ -182,6 +191,8 @@ export default {
         rewrite: '',
         rules: [{ path: '', target_service: '', target_port: null }]
       },
+      // 删除资源弹框
+      deleteResourceDialogVisible: false,
       // 校验表单中数据
       addResourceFormFules: {
         env: [
@@ -324,6 +335,10 @@ export default {
       this.editForm.rules = this.parseData(val.data)
       this.updateResourceDialogVisible = true
       console.log(val)
+    },
+
+    deleteIngress(val) {
+      this.deleteResourceDialogVisible = true
     }
   }
 }
@@ -347,4 +362,7 @@ export default {
     margin-left: 20px;
     margin-right: 20px;
   }
+  /* .el-dialog {
+    border-radius: 5px;
+  } */
 </style>

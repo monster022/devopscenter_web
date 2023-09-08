@@ -51,6 +51,11 @@
           <el-button :disabled="scope.row.project_status === 0" type="text" size="mini" @click="projectDetail(scope.row.alias_name)">{{ scope.row.alias_name }}</el-button>
         </template>
       </el-table-column>
+      <el-table-column label="AppId" header-align="center" align="center">
+        <template slot-scope="scope">
+          {{ scope.row.app_id }}
+        </template>
+      </el-table-column>
       <el-table-column label="语言" header-align="center" align="center">
         <template slot-scope="scope">
           {{ scope.row.language }}

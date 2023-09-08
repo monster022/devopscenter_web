@@ -55,8 +55,8 @@
         </template>
       </el-table-column>
       <el-table-column fixed="right" label="操作" header-align="center" align="center">
-        <template>
-          <el-button type="text" size="small" icon="el-icon-edit">编辑</el-button>
+        <template slot-scope="scope">
+          <el-button type="text" size="small" icon="el-icon-edit" @click="editResource(scope.row)">编辑</el-button>
           <el-button type="text" size="small" icon="el-icon-delete">删除</el-button>
         </template>
       </el-table-column>
@@ -130,6 +130,31 @@
       </div>
     </el-dialog>
 
+    <!-- 编辑资源清单 -->
+    <el-dialog title="编辑service资源" :visible.sync="editResourceDialogVisible" width="600px" center>
+      <el-form :model="editResourceForm">
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="环境" label-width="80px">
+              <el-input v-model="editResourceForm.name" style="width: 150px;" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="名称空间" label-width="80px">
+              <el-input v-model="editResourceForm.name" style="width: 150px;" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-form-item label="名称" label-width="80px" prop="name">
+          <el-input v-model="editResourceForm.name" style="width: 425px;" />
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button size="medium" @click="editResourceDialogVisible = false">取 消</el-button>
+        <el-button size="medium" type="primary" @click="editResourceDialogVisible = false">更 新</el-button>
+      </div>
+    </el-dialog>
+
   </div>
 </template>
 
@@ -152,6 +177,18 @@ export default {
         protocol: '',
         type: '',
         deploymentSwitch: true,
+        deployment: ''
+      },
+      // 更新资源弹框
+      editResourceDialogVisible: false,
+      editResourceForm: {
+        env: '',
+        namespace: '',
+        name: '',
+        port: null,
+        target_port: null,
+        protocol: '',
+        type: '',
         deployment: ''
       },
       // 校验数据不为空
@@ -281,6 +318,17 @@ export default {
           return false
         }
       })
+    },
+
+    editResource(val) {
+      console.log(this.title.env)
+      console.log(this.title.namespace)
+
+      this.editResourceDialogVisible = true
+      this.editResourceForm.env = this.title.env
+      this.editResourceForm.namespace = this.title.namespace
+      this.editResourceForm.name = val.name
+      console.log(val)
     }
   }
 }
