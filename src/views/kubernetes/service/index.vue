@@ -136,17 +136,50 @@
         <el-row>
           <el-col :span="12">
             <el-form-item label="环境" label-width="80px">
-              <el-input v-model="editResourceForm.name" style="width: 150px;" />
+              <el-input v-model="editResourceForm.env" :disabled="true" style="width: 150px;" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="名称空间" label-width="80px">
-              <el-input v-model="editResourceForm.name" style="width: 150px;" />
+              <el-input v-model="editResourceForm.namespace" :disabled="true" style="width: 150px;" />
             </el-form-item>
           </el-col>
         </el-row>
-        <el-form-item label="名称" label-width="80px" prop="name">
-          <el-input v-model="editResourceForm.name" style="width: 425px;" />
+        <el-form-item label="名称" label-width="80px">
+          <el-input v-model="editResourceForm.name" :disabled="true" style="width: 425px;" />
+        </el-form-item>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="协议" label-width="80px">
+              <el-select v-model="editResourceForm.protocol" style="width: 150px;">
+                <el-option label="TCP" value="TCP" />
+                <el-option label="UDP" value="UDP" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="类型" label-width="80px">
+              <el-select v-model="editResourceForm.type" style="width: 150px;">
+                <el-option label="ClusterIP" value="ClusterIP" />
+                <el-option label="NodePort" value="NodePort" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="端口" label-width="80px">
+              <el-input v-model="editResourceForm.port" style="width: 150px;" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="目标端口" label-width="80px">
+              <el-input v-model="editResourceForm.target_port" style="width: 150px;" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-form-item label="应用名" label-width="80px">
+          <el-input v-model="editResourceForm.deployment" style="width: 425px;" />
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
@@ -321,14 +354,15 @@ export default {
     },
 
     editResource(val) {
-      console.log(this.title.env)
-      console.log(this.title.namespace)
-
       this.editResourceDialogVisible = true
       this.editResourceForm.env = this.title.env
       this.editResourceForm.namespace = this.title.namespace
       this.editResourceForm.name = val.name
-      console.log(val)
+      this.editResourceForm.port = val.port
+      this.editResourceForm.target_port = val.target_port
+      this.editResourceForm.protocol = val.protocol
+      this.editResourceForm.type = val.type
+      this.editResourceForm.deployment = val.deployment
     }
   }
 }
