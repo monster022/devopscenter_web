@@ -124,6 +124,36 @@
                 {{ scope.row.id }}
               </template>
             </el-table-column>
+            <el-table-column label="发布者" header-align="center" align="center">
+              <template slot-scope="scope">
+                {{ scope.row.name }}
+              </template>
+            </el-table-column>
+            <el-table-column label="环境" header-align="center" align="center">
+              <template slot-scope="scope">
+                {{ scope.row.env }}
+              </template>
+            </el-table-column>
+            <el-table-column label="发布的机器" header-align="center" align="center">
+              <template slot-scope="scope">
+                {{ scope.row.namespace }}
+              </template>
+            </el-table-column>
+            <el-table-column label="项目版本" header-align="center" align="center">
+              <template slot-scope="scope">
+                {{ scope.row.commit_id }}
+              </template>
+            </el-table-column>
+            <el-table-column label="镜像版本" header-align="center" align="center" show-overflow-tooltip>
+              <template slot-scope="scope">
+                {{ scope.row.version }}
+              </template>
+            </el-table-column>
+            <el-table-column label="发布时间" header-align="center" align="center">
+              <template slot-scope="scope">
+                {{ scope.row.time }}
+              </template>
+            </el-table-column>
           </el-table>
         </div>
       </el-tab-pane>
