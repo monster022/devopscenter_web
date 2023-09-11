@@ -55,8 +55,8 @@
         </template>
       </el-table-column>
       <el-table-column fixed="right" label="操作" header-align="center" align="center">
-        <template>
-          <el-button type="text" size="small" icon="el-icon-edit">编辑</el-button>
+        <template slot-scope="scope">
+          <el-button type="text" size="small" icon="el-icon-edit" @click="editResource(scope.row)">编辑</el-button>
           <el-button type="text" size="small" icon="el-icon-delete">删除</el-button>
         </template>
       </el-table-column>
@@ -130,6 +130,64 @@
       </div>
     </el-dialog>
 
+    <!-- 编辑资源清单 -->
+    <el-dialog title="编辑service资源" :visible.sync="editResourceDialogVisible" width="600px" center>
+      <el-form :model="editResourceForm">
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="环境" label-width="80px">
+              <el-input v-model="editResourceForm.env" :disabled="true" style="width: 150px;" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="名称空间" label-width="80px">
+              <el-input v-model="editResourceForm.namespace" :disabled="true" style="width: 150px;" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-form-item label="名称" label-width="80px">
+          <el-input v-model="editResourceForm.name" :disabled="true" style="width: 425px;" />
+        </el-form-item>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="协议" label-width="80px">
+              <el-select v-model="editResourceForm.protocol" style="width: 150px;">
+                <el-option label="TCP" value="TCP" />
+                <el-option label="UDP" value="UDP" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="类型" label-width="80px">
+              <el-select v-model="editResourceForm.type" style="width: 150px;">
+                <el-option label="ClusterIP" value="ClusterIP" />
+                <el-option label="NodePort" value="NodePort" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="12">
+            <el-form-item label="端口" label-width="80px">
+              <el-input v-model="editResourceForm.port" style="width: 150px;" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="目标端口" label-width="80px">
+              <el-input v-model="editResourceForm.target_port" style="width: 150px;" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-form-item label="应用名" label-width="80px">
+          <el-input v-model="editResourceForm.deployment" style="width: 425px;" />
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button size="medium" @click="editResourceDialogVisible = false">取 消</el-button>
+        <el-button size="medium" type="primary" @click="editResourceDialogVisible = false">更 新</el-button>
+      </div>
+    </el-dialog>
+
   </div>
 </template>
 
@@ -152,6 +210,18 @@ export default {
         protocol: '',
         type: '',
         deploymentSwitch: true,
+        deployment: ''
+      },
+      // 更新资源弹框
+      editResourceDialogVisible: false,
+      editResourceForm: {
+        env: '',
+        namespace: '',
+        name: '',
+        port: null,
+        target_port: null,
+        protocol: '',
+        type: '',
         deployment: ''
       },
       // 校验数据不为空
@@ -281,6 +351,18 @@ export default {
           return false
         }
       })
+    },
+
+    editResource(val) {
+      this.editResourceDialogVisible = true
+      this.editResourceForm.env = this.title.env
+      this.editResourceForm.namespace = this.title.namespace
+      this.editResourceForm.name = val.name
+      this.editResourceForm.port = val.port
+      this.editResourceForm.target_port = val.target_port
+      this.editResourceForm.protocol = val.protocol
+      this.editResourceForm.type = val.type
+      this.editResourceForm.deployment = val.deployment
     }
   }
 }

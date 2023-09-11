@@ -3,7 +3,7 @@
     <!-- 表头 -->
     <div>
       <el-button style="float: left;" type="primary" icon="el-icon-plus" @click="additionOpen()">添加实例</el-button>
-      <el-input v-model="headInput" style="float: left; width: 200px; margin-left: 30px;" placeholder="请输入IP模糊搜索" @change="fetchData()">
+      <el-input v-model="headInput" style="float: left; width: 200px; margin-left: 30px;" placeholder="ip或名称模糊搜索" @change="fetchData()">
         <i slot="prefix" class="el-input__icon el-icon-search" />
       </el-input>
       <download-excel ref="jsonExcel" :data="excel_data" :fields="excel_fields" name="machine">

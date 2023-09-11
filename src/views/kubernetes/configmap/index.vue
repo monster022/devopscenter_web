@@ -44,8 +44,8 @@
         </template>
       </el-table-column>
       <el-table-column fixed="right" label="操作" header-align="center" align="center">
-        <template>
-          <el-button type="text" size="small" icon="el-icon-edit">编辑</el-button>
+        <template slot-scope="scope">
+          <el-button type="text" size="small" icon="el-icon-edit" @click="editResource(scope.row)">编辑</el-button>
           <el-button type="text" size="small" icon="el-icon-delete">删除</el-button>
         </template>
       </el-table-column>
@@ -102,6 +102,52 @@
       </div>
     </el-dialog>
 
+    <el-dialog title="编辑ConfigMap资源" :visible.sync="editResourceDialogVisible" width="1000px" center>
+      <el-form :model="editResourceForm">
+        <el-row>
+          <el-col :span="8">
+            <el-form-item label="环境" label-width="70px">
+              <el-input v-model="editResourceForm.env" :disabled="true" style="width: 210px;" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="名称空间" label-width="70px">
+              <el-input v-model="editResourceForm.namespace" :disabled="true" style="width: 210px;" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="8">
+            <el-form-item label="名称" label-width="70px">
+              <el-input v-model="editResourceForm.name" :disabled="true" style="width: 210px;" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-row>
+          <el-col :span="6">
+            <el-form-item v-for="(item, index) in editResourceForm.data" :key="index" label="KV" label-width="70px">
+              <el-input v-model="item.key" type="textarea" style="width: 170px; margin-top: 10px;" placeholder="e.g. foo" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="4">
+            <el-form-item v-for="(item, index) in editResourceForm.data" :key="index" label-width="70px">
+              <el-button type="danger" size="mini" circle icon="el-icon-minus" style="margin-top: 30px;" @click="removeItemEditResource(index)" />
+            </el-form-item>
+          </el-col>
+          <el-col :span="14">
+            <el-form-item v-for="(item, index) in editResourceForm.data" :key="index">
+              <el-input v-model="item.value" type="textarea" style="width: 520px; margin-top: 10px;" placeholder="e.g. bar" />
+            </el-form-item>
+          </el-col>
+        </el-row>
+        <el-form-item label-width="70px">
+          <el-button type="primary" size="mini" icon="el-icon-plus" circle @click="addItemEditResource()" />
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button size="medium" @click="editResourceDialogVisible = false">取 消</el-button>
+        <el-button size="medium" type="primary" @click="editResourceDialogVisible = false">更 新</el-button>
+      </div>
+    </el-dialog>
+
   </div>
 </template>
 
@@ -120,6 +166,14 @@ export default {
         namespace: '',
         name: '',
         items: [{ key: '123', value: '' }]
+      },
+      // 编辑资源弹框
+      editResourceDialogVisible: false,
+      editResourceForm: {
+        env: '',
+        namespace: '',
+        name: '',
+        data: [{ key: '', value: '' }]
       },
       // 校验表中数据
       addResourceFormRules: {
@@ -166,6 +220,12 @@ export default {
     },
     removeItem(index) {
       this.addResourceForm.items.splice(index, 1)
+    },
+    addItemEditResource() {
+      this.editResourceForm.data.push({ key: '', value: '' })
+    },
+    removeItemEditResource(index) {
+      this.editResourceForm.data.splice(index, 1)
     },
     envChange() {
       const params = {
@@ -236,6 +296,15 @@ export default {
           return false
         }
       })
+    },
+
+    editResource(val) {
+      this.editResourceForm.env = this.title.env
+      this.editResourceForm.namespace = this.title.namespace
+      this.editResourceForm.name = val.name
+      this.editResourceForm.data = this.parseData(val.data)
+      this.editResourceDialogVisible = true
+      console.log(val)
     }
   }
 }

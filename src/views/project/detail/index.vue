@@ -1,7 +1,6 @@
 <template>
   <div class="app-container">
     <el-tabs v-model="activeName" tab-position="top" style="height: 200px;" @tab-click="handleClick">
-
       <!-- 构建详情 -->
       <el-tab-pane label="构建详情" name="first">
         <div class="app-container">
@@ -116,10 +115,6 @@
           <el-table
             v-loading.fullscreen.lock="fullscreenLoading"
             :data="dockerdeployList"
-            element-loading-text="小老弟莫急 正玩命加载中"
-            element-loading-spinner="el-icon-loading"
-            element-loading-background="rgba(0, 0, 0, 0.7)"
-            fit
             stripe
             max-height="800"
             highlight-current-row
@@ -129,11 +124,40 @@
                 {{ scope.row.id }}
               </template>
             </el-table-column>
+            <el-table-column label="发布者" header-align="center" align="center">
+              <template slot-scope="scope">
+                {{ scope.row.name }}
+              </template>
+            </el-table-column>
+            <el-table-column label="环境" header-align="center" align="center">
+              <template slot-scope="scope">
+                {{ scope.row.env }}
+              </template>
+            </el-table-column>
+            <el-table-column label="发布的机器" header-align="center" align="center">
+              <template slot-scope="scope">
+                {{ scope.row.namespace }}
+              </template>
+            </el-table-column>
+            <el-table-column label="项目版本" header-align="center" align="center">
+              <template slot-scope="scope">
+                {{ scope.row.commit_id }}
+              </template>
+            </el-table-column>
+            <el-table-column label="镜像版本" header-align="center" align="center" show-overflow-tooltip>
+              <template slot-scope="scope">
+                {{ scope.row.version }}
+              </template>
+            </el-table-column>
+            <el-table-column label="发布时间" header-align="center" align="center">
+              <template slot-scope="scope">
+                {{ scope.row.time }}
+              </template>
+            </el-table-column>
           </el-table>
         </div>
       </el-tab-pane>
     </el-tabs>
-
   </div>
 </template>
 
@@ -151,11 +175,7 @@ export default {
       deployList: null,
       dockerdeployList: null,
       // 刷新
-      fullscreenLoading: false,
-      // 分页
-      total: null,
-      currentPage: 1,
-      size: 15
+      fullscreenLoading: false
     }
   },
   created() {
@@ -163,34 +183,33 @@ export default {
   },
   methods: {
     fetchData() {
-      this.fullscreenLoading = true
+      const loading = this.$loading({
+        lock: true,
+        text: '小老弟莫急 正玩命加载中',
+        spinner: 'el-icon-loading',
+        background: 'rgba(0, 0, 0, 0.7)'
+      })
       const params = {
-        page: 1,
-        size: this.size,
         publishType: 'Kubernetes'
       }
-      // console.log(this.$route.params.project)
       getProjectDetails(this.$route.params.project, params).then(response => {
         this.list = response.data
-        this.total = response.total
       })
       getProjectDeployDetails(this.$route.params.project, params).then(response => (
         this.deployList = response.data
       ))
       const params2 = {
-        page: 1,
-        size: this.size,
         publishType: 'Docker'
       }
       getProjectDeployDetails(this.$route.params.project, params2).then(response => (
         this.dockerdeployList = response.data
       ))
       setTimeout(() => {
-        this.fullscreenLoading = false
+        loading.close()
       }, 500)
     },
-    handleClick(tab, event) {
-      console.log(tab, event)
+    handleClick() {
+      this.fetchData()
     }
   }
 }
